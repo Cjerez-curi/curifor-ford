@@ -388,16 +388,7 @@
 <div class="section" id="sec-compra">
 
   <div class="panel">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;background:#f0f4f8;border-radius:8px;padding:10px 14px;">
-      <span style="font-size:13px;font-weight:700;color:#4A5568;">Sucursal:</span>
-      <select style="border:1px solid #CBD5E0;border-radius:6px;padding:5px 10px;font-size:13px;color:#2D3748;background:#fff;cursor:pointer;" onchange="_sucActual=this.value; cargarPagina();">
-        <option>Curifor Chillan</option>
-        <option>Curifor Curico</option>
-        <option>Curifor Linderos</option>
-        <option>Curifor Rancagua</option>
-      </select>
-    </div>
-    <h2>🛒 Incentivo Mensual por Cumplimiento de Compra</h2>
+    <h2>🛒 Incentivo Mensual por Cumplimiento de Compra — Red Curifor</h2>
 
     <div class="info-box">
       Rebate calculado sobre <strong>BLM = Total Comprado – Garantías (GNM) – Notas de Crédito (NCM)</strong>.
@@ -405,63 +396,32 @@
     </div>
 
     <h3>📥 Ingreso de Datos del Mes</h3>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Meta de Compra Mensual ($)</label>
-        <input type="number" id="in-meta" placeholder="0" oninput="calcularCompra()">
-      </div>
-      <div class="form-group">
-        <label>Total Comprado ($)</label>
-        <input type="number" id="in-comprado" placeholder="0" oninput="calcularCompra()">
-      </div>
-      <div class="form-group">
-        <label>Garantías Notificadas — GNM ($)</label>
-        <input type="number" id="in-gnm" placeholder="0" oninput="calcularCompra()">
-      </div>
-      <div class="form-group">
-        <label>Notas de Crédito — NCM ($)</label>
-        <input type="number" id="in-ncm" placeholder="0" oninput="calcularCompra()">
-      </div>
-      <div class="form-group">
-        <label>BLM calculado ($)</label>
-        <input type="text" id="in-blm" readonly placeholder="Automático">
-      </div>
-      <div class="form-group">
-        <label>% Cumplimiento</label>
-        <input type="text" id="in-pct" readonly placeholder="Automático">
-      </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="background:var(--ford);color:#fff;">
+            <th style="padding:10px 12px;text-align:left;font-weight:700;">Sucursal</th>
+            <th style="padding:10px 8px;text-align:center;">Meta ($)</th>
+            <th style="padding:10px 8px;text-align:center;">Comprado ($)</th>
+            <th style="padding:10px 8px;text-align:center;">GNM ($)</th>
+            <th style="padding:10px 8px;text-align:center;">NCM ($)</th>
+            <th style="padding:10px 8px;text-align:center;">BLM ($)</th>
+            <th style="padding:10px 8px;text-align:center;">% Cump.</th>
+            <th style="padding:10px 8px;text-align:center;">NPS (%)</th>
+            <th style="padding:10px 8px;text-align:center;">Tasa (%)</th>
+            <th style="padding:10px 8px;text-align:center;">NPS OK</th>
+            <th style="padding:10px 8px;text-align:center;">Rebate</th>
+          </tr>
+        </thead>
+        <tbody id="compra-tbody"></tbody>
+        <tfoot id="compra-tfoot"></tfoot>
+      </table>
     </div>
 
-    <div class="formula-box">BLM = Total Comprado – GNM – NCM</div>
+    <div class="formula-box" style="margin-top:14px;">BLM = Total Comprado – GNM – NCM &nbsp;·&nbsp; Rebate: ≥110%→5% · 100–109%→4% · &lt;100%→0% · Bonus NPS +1%</div>
 
-    <h3>⭐ Bonus NPS (condición adicional +1%)</h3>
-    <div class="nps-check">
-      <input type="checkbox" id="chk-nps" onchange="calcularCompra()">
-      <label for="chk-nps" style="cursor:pointer; font-size:13px;">
-        NPS ≥ <strong>83%</strong> y tasa de respuesta ≥ <strong>18%</strong> (confirmado por Gerente de Zona)
-      </label>
-    </div>
-    <div class="form-grid" style="margin-top:12px;">
-      <div class="form-group">
-        <label>NPS del mes (%)</label>
-        <input type="number" id="in-nps" placeholder="0.0" step="0.1" oninput="calcularCompra()">
-      </div>
-      <div class="form-group">
-        <label>Tasa de Respuesta (%)</label>
-        <input type="number" id="in-tasa" placeholder="0.0" step="0.1" oninput="calcularCompra()">
-      </div>
-    </div>
-
-    <div class="rebate-box" id="rebate-result">
-      <div class="rebate-icon">📦</div>
-      <div>
-        <div class="rebate-pct" id="rebate-pct-val">—</div>
-        <div class="rebate-detail" id="rebate-detail-txt">Ingresa los datos para calcular el rebate</div>
-      </div>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="guardarCompra()">💾 Guardar datos del mes</button>
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="guardarCompra()">💾 Guardar todos</button>
       <button class="btn btn-outline" onclick="limpiarCompra()">🗑️ Limpiar</button>
     </div>
   </div>
@@ -1710,100 +1670,97 @@ function semaforo(pct) {
 }
 
 // ── CÁLCULO COMPRA ──────────────────────────────────────────────────────────
-function calcularCompra() {
-  const meta     = parseFloat(document.getElementById('in-meta').value)     || 0;
-  const comprado = parseFloat(document.getElementById('in-comprado').value) || 0;
-  const gnm      = parseFloat(document.getElementById('in-gnm').value)      || 0;
-  const ncm      = parseFloat(document.getElementById('in-ncm').value)      || 0;
-  const nps      = parseFloat(document.getElementById('in-nps').value)      || 0;
-  const tasa     = parseFloat(document.getElementById('in-tasa').value)     || 0;
-  const chkNPS   = document.getElementById('chk-nps').checked;
+// ── COMPRA: tabla red completa ────────────────────────────────────────────────
+const INP = s => `border:1px solid #CBD5E0;border-radius:4px;padding:5px 6px;font-size:12px;width:100%;text-align:right;`;
 
+function _calcRow(i) {
+  const v = f => parseFloat(document.getElementById(f+i)?.value) || 0;
+  const meta=v('cm-meta-'), comprado=v('cm-comp-'), gnm=v('cm-gnm-'), ncm=v('cm-ncm-');
+  const nps=v('cm-nps-'), tasa=v('cm-tasa-');
+  const chk = document.getElementById('cm-chk-'+i)?.checked || false;
   const blm = Math.max(0, comprado - gnm - ncm);
-  const pct = meta > 0 ? (comprado / meta) * 100 : 0;
-
-  document.getElementById('in-blm').value = blm > 0 ? fmtMoney(blm) : '';
-  document.getElementById('in-pct').value = meta > 0 ? fmtPct(pct) : '';
-
-  // Rebate base
-  let rebBase = 0;
-  if (pct >= 110) rebBase = 5.0;
-  else if (pct >= 100) rebBase = 4.0;
-
-  // Bonus NPS
-  const npsOk = (nps >= 83 && tasa >= 18) || chkNPS;
-  const bonus = (rebBase > 0 && npsOk) ? 1.0 : 0.0;
+  const pct = meta > 0 ? comprado/meta*100 : 0;
+  let rebBase = pct>=110 ? 5 : pct>=100 ? 4 : 0;
+  const npsOk = (nps>=83 && tasa>=18) || chk;
+  const bonus = rebBase>0 && npsOk ? 1 : 0;
   const rebTotal = rebBase + bonus;
-  const montoRebate = blm * (rebTotal / 100);
-
-  // UI
-  const box = document.getElementById('rebate-result');
-  const pctEl = document.getElementById('rebate-pct-val');
-  const detEl = document.getElementById('rebate-detail-txt');
-  box.className = 'rebate-box';
-  pctEl.className = 'rebate-pct';
-
-  if (meta === 0) {
-    pctEl.textContent = '—';
-    detEl.innerHTML = 'Ingresa la meta mensual para calcular';
-    return;
+  const el = id => document.getElementById(id);
+  if(el('cm-blm-'+i))  el('cm-blm-'+i).textContent  = blm>0 ? fmtMoney(blm) : '—';
+  if(el('cm-pct-'+i))  el('cm-pct-'+i).textContent  = meta>0 ? fmtPct(pct) : '—';
+  if(el('cm-reb-'+i)) {
+    const r = el('cm-reb-'+i);
+    r.textContent = rebTotal>0 ? rebTotal.toFixed(1)+'%' : '0%';
+    r.style.fontWeight='700';
+    r.style.color = rebTotal>=4 ? 'var(--verde)' : rebTotal>0 ? 'var(--amarillo)' : 'var(--rojo)';
   }
-
-  if (rebTotal > 0) {
-    const color = 'verde';
-    box.classList.add(color);
-    pctEl.classList.add(color);
-    pctEl.textContent = rebTotal.toFixed(1) + '%';
-    detEl.innerHTML = `<b>Cumplimiento: ${fmtPct(pct)}</b> · BLM: ${fmtMoney(blm)}<br>
-      Rebate base: ${rebBase}% ${bonus > 0 ? '+ Bonus NPS: +1%' : ''}<br>
-      <b>Monto estimado: ${fmtMoney(montoRebate)}</b>`;
-  } else {
-    box.classList.add('rojo');
-    pctEl.classList.add('rojo');
-    pctEl.textContent = '0%';
-    detEl.innerHTML = `<b>Cumplimiento: ${fmtPct(pct)}</b> · BLM: ${fmtMoney(blm)}<br>No se alcanzó el objetivo (mín. 100%) · Rebate: $0`;
-  }
+  return {meta,comprado,gnm,ncm,nps,tasa,chkNPS:chk,blm,pct,rebBase,bonus,rebTotal};
 }
+
+function renderCompraTabla() {
+  const mes = getMes(); const store = cargarStore();
+  const tbody = document.getElementById('compra-tbody');
+  const tfoot = document.getElementById('compra-tfoot');
+  if(!tbody) return;
+  const inp = (id,val,ev) => `<input type="number" id="${id}" value="${val||''}" placeholder="0" oninput="${ev}" style="${INP()}">`;
+  tbody.innerHTML = SUCURSALES.map((suc,i) => {
+    const d = getDato(suc, mes);
+    return `<tr style="border-bottom:1px solid #E2E8F0;${i%2===0?'background:#F8FAFC':''}">
+      <td style="padding:8px 12px;font-weight:700;color:var(--ford);white-space:nowrap;">${suc}</td>
+      <td style="padding:4px 6px;">${inp('cm-meta-'+i, d.meta, '_calcRow('+i+')')}</td>
+      <td style="padding:4px 6px;">${inp('cm-comp-'+i, d.comprado, '_calcRow('+i+')')}</td>
+      <td style="padding:4px 6px;">${inp('cm-gnm-'+i, d.gnm, '_calcRow('+i+')')}</td>
+      <td style="padding:4px 6px;">${inp('cm-ncm-'+i, d.ncm, '_calcRow('+i+')')}</td>
+      <td style="padding:8px 6px;text-align:center;font-size:12px;" id="cm-blm-${i}">${d.blm>0?fmtMoney(d.blm):'—'}</td>
+      <td style="padding:8px 6px;text-align:center;font-size:12px;" id="cm-pct-${i}">${d.pct>0?fmtPct(d.pct):'—'}</td>
+      <td style="padding:4px 6px;">${inp('cm-nps-'+i, d.nps, '_calcRow('+i+')')}</td>
+      <td style="padding:4px 6px;">${inp('cm-tasa-'+i, d.tasa, '_calcRow('+i+')')}</td>
+      <td style="padding:8px 6px;text-align:center;"><input type="checkbox" id="cm-chk-${i}" ${d.chkNPS?'checked':''} onchange="_calcRow(${i})" title="NPS OK manual"></td>
+      <td style="padding:8px 10px;text-align:center;font-size:13px;" id="cm-reb-${i}"
+        style="color:${d.rebTotal>=4?'var(--verde)':d.rebTotal>0?'var(--amarillo)':'var(--rojo)'}">
+        ${d.rebTotal>0?d.rebTotal.toFixed(1)+'%':'0%'}
+      </td>
+    </tr>`;
+  }).join('');
+  // Fila totales
+  const tots = SUCURSALES.reduce((a,suc)=>{ const d=getDato(suc,mes);
+    return {meta:a.meta+(d.meta||0), comp:a.comp+(d.comprado||0), blm:a.blm+(d.blm||0),
+            monto:a.monto+(d.blm||0)*(d.rebTotal||0)/100}; },{meta:0,comp:0,blm:0,monto:0});
+  const pctTot = tots.meta>0 ? tots.comp/tots.meta*100 : 0;
+  tfoot.innerHTML = `<tr style="background:var(--ford);color:#fff;font-weight:700;">
+    <td style="padding:8px 12px;">GRUPO CURIFOR</td>
+    <td style="padding:8px 6px;text-align:center;font-size:12px;">${fmtMoney(tots.meta)}</td>
+    <td style="padding:8px 6px;text-align:center;font-size:12px;">${fmtMoney(tots.comp)}</td>
+    <td colspan="2" style="padding:8px 6px;text-align:center;font-size:11px;">—</td>
+    <td style="padding:8px 6px;text-align:center;font-size:12px;">${fmtMoney(tots.blm)}</td>
+    <td style="padding:8px 6px;text-align:center;font-size:12px;">${tots.meta>0?fmtPct(pctTot):'—'}</td>
+    <td colspan="3" style="padding:8px 6px;text-align:center;font-size:11px;">—</td>
+    <td style="padding:8px 10px;text-align:center;font-size:12px;">${fmtMoney(tots.monto)}</td>
+  </tr>`;
+}
+
+function calcularCompra() { SUCURSALES.forEach((_,i) => _calcRow(i)); }
 
 function guardarCompra() {
-  const meta     = parseFloat(document.getElementById('in-meta').value)     || 0;
-  const comprado = parseFloat(document.getElementById('in-comprado').value) || 0;
-  const gnm      = parseFloat(document.getElementById('in-gnm').value)      || 0;
-  const ncm      = parseFloat(document.getElementById('in-ncm').value)      || 0;
-  const nps      = parseFloat(document.getElementById('in-nps').value)      || 0;
-  const tasa     = parseFloat(document.getElementById('in-tasa').value)     || 0;
-  const chkNPS   = document.getElementById('chk-nps').checked;
-
-  const blm = Math.max(0, comprado - gnm - ncm);
-  const pct = meta > 0 ? (comprado / meta) * 100 : 0;
-  let rebBase = 0;
-  if (pct >= 110) rebBase = 5.0;
-  else if (pct >= 100) rebBase = 4.0;
-  const npsOk = (nps >= 83 && tasa >= 18) || chkNPS;
-  const bonus = (rebBase > 0 && npsOk) ? 1.0 : 0.0;
-  const rebTotal = rebBase + bonus;
-
-  setDato(getSucursal(), getMes(), { meta, comprado, gnm, ncm, nps, tasa, chkNPS, blm, pct, rebBase, bonus, rebTotal });
+  const mes = getMes();
+  SUCURSALES.forEach((suc, i) => {
+    const d = _calcRow(i);
+    setDato(suc, mes, d);
+  });
   renderDashboard();
-  showToast('✅ Datos guardados correctamente');
+  showToast('✅ Datos de red guardados correctamente');
 }
 
-function cargarDatosCompra() {
-  const d = getDato(getSucursal(), getMes());
-  document.getElementById('in-meta').value     = d.meta     || '';
-  document.getElementById('in-comprado').value = d.comprado || '';
-  document.getElementById('in-gnm').value      = d.gnm      || '';
-  document.getElementById('in-ncm').value      = d.ncm      || '';
-  document.getElementById('in-nps').value      = d.nps      || '';
-  document.getElementById('in-tasa').value     = d.tasa     || '';
-  document.getElementById('chk-nps').checked   = d.chkNPS   || false;
-  calcularCompra();
-}
+function cargarDatosCompra() { renderCompraTabla(); }
 
 function limpiarCompra() {
-  ['in-meta','in-comprado','in-gnm','in-ncm','in-nps','in-tasa'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('chk-nps').checked = false;
-  calcularCompra();
+  const mes = getMes();
+  SUCURSALES.forEach((suc,i) => {
+    ['cm-meta-','cm-comp-','cm-gnm-','cm-ncm-','cm-nps-','cm-tasa-'].forEach(p => {
+      const el = document.getElementById(p+i); if(el) el.value='';
+    });
+    const chk = document.getElementById('cm-chk-'+i); if(chk) chk.checked=false;
+    _calcRow(i);
+  });
 }
 
 // ── DASHBOARD ────────────────────────────────────────────────────────────────
@@ -2388,10 +2345,10 @@ async function procesarExcelNPS() {
       if (isNaN(nC)||isNaN(nM)) return;
       totEnc++;
 
-      // Marca: 5=P, 4=N, 1-3=D
+      // Marca: 5=P, 4=N, 1-3=D (escala 1-5 Ford)
       const catM = nM===5?'P':(nM===4?'N':'D');
-      // Conc: si Marca ≤3 → forzar D
-      const catC = nM<=3?'D':(nC>=4?'P':(nC===3?'N':'D'));
+      // Conc: 5=P, 4=N, 1-3=D; si Marca es Detractor (≤3) → forzar D en Conc.
+      const catC = nM<=3?'D':(nC===5?'P':(nC===4?'N':'D'));
       const ftfrOk = ['sí','si','yes','1','true'].includes(ftfr);
       if (ftfr!=='') { ftfrTotal++; if (ftfrOk) ftfrSi++; }
 
@@ -2408,13 +2365,22 @@ async function procesarExcelNPS() {
       if (ftfr!==''){a.fTot++;if(ftfrOk)a.fSi++;}
     });
 
-    const pct=(p,t)=>t>0?(p/t)*100:0;
-    const brC=(n,t)=>n<83?Math.max(0,Math.ceil(83*t/100)-Math.floor(n*t/100)):null;
+    // Fórmula NPS estándar: (Promotores − Detractores) / Total × 100
+    const nps=(p,d,t)=>t>0?((p-d)/t)*100:0;
+    const pctSimple=(p,t)=>t>0?(p/t)*100:0; // solo para FTFR (no es NPS)
+    // Brecha: promotores adicionales necesarios para llegar a 83%
+    // NPS ≥ 83% → (P-D)/T ≥ 0.83 → P ≥ D + 0.83*T
+    const brC=(p,d,t,tgt=83)=>{
+      const npsVal=nps(p,d,t);
+      if(npsVal>=tgt) return null;
+      const needed=Math.ceil(d + tgt*t/100);
+      return Math.max(0, needed - p);
+    };
 
     const sucursales = Object.entries(sucMap).map(([nombre,s])=>{
       const tC=s.pC+s.nC+s.dC, tM=s.pM+s.nM+s.dM;
-      const npsC=pct(s.pC,tC), npsM=pct(s.pM,tM), ftP=s.fTot>0?pct(s.fSi,s.fTot):0;
-      const bC=brC(npsC,tC), bM=brC(npsM,tM);
+      const npsC=nps(s.pC,s.dC,tC), npsM=nps(s.pM,s.dM,tM), ftP=s.fTot>0?pctSimple(s.fSi,s.fTot):0;
+      const bC=brC(s.pC,s.dC,tC), bM=brC(s.pM,s.dM,tM);
       const bF=ftP<95&&s.fTot>0?Math.ceil(95*s.fTot/100)-s.fSi:null;
       const estado=npsC>=83&&npsM>=83&&ftP>=95?'Logrado':(npsC<83&&npsM<83?'No logrado':'Parcial');
       return {nombre,encuestas:s.enc,prom_conc:s.pC,neut_conc:s.nC,det_conc:s.dC,nps_conc:+npsC.toFixed(1),
@@ -2425,8 +2391,8 @@ async function procesarExcelNPS() {
 
     const asesores = Object.entries(asMap).map(([nombre,a])=>{
       const tC=a.pC+a.nC+a.dC, tM=a.pM+a.nM+a.dM;
-      const npsC=pct(a.pC,tC), npsM=pct(a.pM,tM), ftP=a.fTot>0?pct(a.fSi,a.fTot):0;
-      const bC=brC(npsC,tC), bM=brC(npsM,tM);
+      const npsC=nps(a.pC,a.dC,tC), npsM=nps(a.pM,a.dM,tM), ftP=a.fTot>0?pctSimple(a.fSi,a.fTot):0;
+      const bC=brC(a.pC,a.dC,tC), bM=brC(a.pM,a.dM,tM);
       const bF=ftP<95&&a.fTot>0?Math.ceil(95*a.fTot/100)-a.fSi:null;
       return {nombre,sucursal:a.suc,ots:a.ots,nps_conc:+npsC.toFixed(1),nps_marca:+npsM.toFixed(1),ftfr:+ftP.toFixed(1),
         brecha_conc:bC?`+${bC} prom.`:null, brecha_marca:bM?`+${bM} prom.`:null, brecha_ftfr:bF?`+${bF} FTFR`:null};
@@ -2437,7 +2403,7 @@ async function procesarExcelNPS() {
       return b.nps_conc-a.nps_conc||b.nps_marca-a.nps_marca||b.ftfr-a.ftfr;
     }).map((a,i)=>({rank:i+1,...a}));
 
-    // Totales grupo
+    // Totales grupo (suma de promotores y detractores de todas las sucursales)
     const tPC=sucursales.reduce((s,x)=>s+x.prom_conc,0);
     const tNC=sucursales.reduce((s,x)=>s+x.neut_conc,0);
     const tDC=sucursales.reduce((s,x)=>s+x.det_conc,0);
@@ -2445,7 +2411,7 @@ async function procesarExcelNPS() {
     const tNM=sucursales.reduce((s,x)=>s+x.neut_marca,0);
     const tDM=sucursales.reduce((s,x)=>s+x.det_marca,0);
     const nG=tPC+tNC+tDC, nGM=tPM+tNM+tDM;
-    const npsGC=+pct(tPC,nG).toFixed(1), npsGM=+pct(tPM,nGM).toFixed(1), ftG=+(ftfrTotal>0?pct(ftfrSi,ftfrTotal):0).toFixed(1);
+    const npsGC=+nps(tPC,tDC,nG).toFixed(1), npsGM=+nps(tPM,tDM,nGM).toFixed(1), ftG=+(ftfrTotal>0?pctSimple(ftfrSi,ftfrTotal):0).toFixed(1);
     const hoy=new Date(); const fecha=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
 
     npsProcessedData = {
