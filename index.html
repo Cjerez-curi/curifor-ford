@@ -1,0 +1,2550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard KPI Post Venta Ford 2026 — Grupo Curifor</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --azul:    #003478;
+    --celeste: #1A8FD1;
+    --gris:    #F4F6F9;
+    --border:  #DDE2EA;
+    --text:    #1C2A3A;
+    --verde:   #1A9E5C;
+    --amarillo:#D4A017;
+    --rojo:    #C0392B;
+    --blanco:  #FFFFFF;
+    --shadow:  0 2px 8px rgba(0,52,120,.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gris); color: var(--text); min-height: 100vh; }
+
+  /* LOGIN */
+#login-overlay{position:fixed;inset:0;background:#e8eef5;z-index:9999;display:flex;align-items:center;justify-content:center}
+.login-box{background:#fff;border-radius:14px;padding:48px 40px 40px;box-shadow:0 4px 32px rgba(0,52,120,.15);width:100%;max-width:400px;text-align:center}
+.login-logo{font-size:26px;font-weight:900;color:var(--ford);letter-spacing:2px;margin-bottom:4px}
+.login-sub{font-size:13px;color:#666;margin-bottom:8px}
+.login-divider{border:none;border-top:1px solid #e2e8f0;margin:20px 0}
+.login-box h2{font-size:17px;color:var(--ford);font-weight:700;margin-bottom:20px}
+.login-field{display:flex;flex-direction:column;gap:5px;text-align:left;margin-bottom:14px}
+.login-field label{font-size:12px;color:#666;font-weight:600}
+.login-field input{border:1px solid #e2e8f0;border-radius:7px;padding:10px 12px;font-size:14px;color:#1e293b;transition:border .15s;outline:none}
+.login-field input:focus{border-color:var(--celeste)}
+.login-btn{width:100%;background:var(--ford);color:#fff;border:none;border-radius:7px;padding:11px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;transition:background .15s}
+.login-btn:hover{background:var(--celeste)}
+.login-error{color:#C0392B;font-size:13px;margin-top:10px;min-height:18px}
+.login-footer{font-size:11px;color:#aaa;margin-top:18px}
+
+/* TOPBAR */
+  .topbar { background: var(--azul); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 58px; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .ford-logo { width: 44px; height: 44px; background: var(--celeste); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; letter-spacing: -1px; color: #fff; border: 2px solid rgba(255,255,255,.35); }
+  .topbar h1 { font-size: 17px; font-weight: 700; letter-spacing: .3px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  select.ctrl { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.3); border-radius: 6px; padding: 5px 10px; font-size: 13px; cursor: pointer; }
+  select.ctrl option { background: var(--azul); }
+
+  /* TABS */
+  .tabs { background: var(--blanco); border-bottom: 1px solid var(--border); display: flex; gap: 0; overflow-x: auto; }
+  .tab { padding: 13px 18px; font-size: 13px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; color: #6B7A8D; white-space: nowrap; transition: all .18s; }
+  .tab:hover { color: var(--azul); background: rgba(0,52,120,.04); }
+  .tab.active { color: var(--azul); border-bottom-color: var(--azul); background: rgba(0,52,120,.05); }
+
+  /* MAIN */
+  main { max-width: 1200px; margin: 24px auto; padding: 0 20px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .card { background: var(--blanco); border-radius: 12px; padding: 18px 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+  .card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: #8A95A3; margin-bottom: 6px; }
+  .card-value { font-size: 26px; font-weight: 800; color: var(--azul); }
+  .card-sub { font-size: 12px; color: #8A95A3; margin-top: 3px; }
+  .card.verde .card-value { color: var(--verde); }
+  .card.amarillo .card-value { color: var(--amarillo); }
+  .card.rojo .card-value { color: var(--rojo); }
+
+  /* PANEL */
+  .panel { background: var(--blanco); border-radius: 12px; padding: 22px 24px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; }
+  .panel h2 { font-size: 15px; font-weight: 700; color: var(--azul); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .panel h3 { font-size: 13px; font-weight: 700; color: #4A5568; margin: 16px 0 10px; border-top: 1px solid var(--border); padding-top: 14px; }
+
+  /* FORM GRID */
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 12px; font-weight: 600; color: #4A5568; }
+  .form-group input, .form-group select { border: 1px solid var(--border); border-radius: 7px; padding: 8px 11px; font-size: 13px; color: var(--text); transition: border .15s; }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--celeste); box-shadow: 0 0 0 3px rgba(26,143,209,.12); }
+  .form-group input[readonly] { background: var(--gris); color: #6B7A8D; font-weight: 700; }
+
+  /* REBATE BOX */
+  .rebate-box { margin-top: 18px; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 18px; border: 2px solid var(--border); }
+  .rebate-box.verde { border-color: var(--verde); background: rgba(26,158,92,.07); }
+  .rebate-box.amarillo { border-color: var(--amarillo); background: rgba(212,160,23,.07); }
+  .rebate-box.rojo { border-color: var(--rojo); background: rgba(192,57,43,.07); }
+  .rebate-icon { font-size: 32px; }
+  .rebate-pct { font-size: 32px; font-weight: 900; }
+  .rebate-box.verde .rebate-pct { color: var(--verde); }
+  .rebate-box.amarillo .rebate-pct { color: var(--amarillo); }
+  .rebate-box.rojo .rebate-pct { color: var(--rojo); }
+  .rebate-detail { font-size: 13px; color: #4A5568; line-height: 1.5; }
+  .rebate-detail b { color: var(--text); }
+
+  /* SEMAFORO */
+  .semaforo { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+  .s-verde { background: rgba(26,158,92,.15); color: var(--verde); }
+  .s-amarillo { background: rgba(212,160,23,.15); color: #9A7010; }
+  .s-rojo { background: rgba(192,57,43,.15); color: var(--rojo); }
+  .s-gris { background: #E5E8EE; color: #6B7A8D; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--azul); color: #fff; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 12px; }
+  th:first-child { border-radius: 8px 0 0 0; }
+  th:last-child { border-radius: 0 8px 0 0; }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  tr:hover td { background: rgba(0,52,120,.03); }
+  tr:last-child td { border-bottom: none; }
+
+  /* BOTONES */
+  .btn { padding: 9px 18px; border-radius: 7px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: all .15s; display: inline-flex; align-items: center; gap: 7px; }
+  .btn-primary { background: var(--azul); color: #fff; }
+  .btn-primary:hover { background: #002255; }
+  .btn-success { background: var(--verde); color: #fff; }
+  .btn-success:hover { background: #147A48; }
+  .btn-danger { background: var(--rojo); color: #fff; }
+  .btn-danger:hover { background: #9B2B20; }
+  .btn-outline { background: transparent; color: var(--azul); border: 1px solid var(--azul); }
+  .btn-outline:hover { background: rgba(0,52,120,.06); }
+  .btn-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+  /* FORMULA BOX */
+  .formula-box { background: #EEF3FB; border-left: 4px solid var(--celeste); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 16px 0; font-family: monospace; font-size: 13px; color: var(--azul); }
+
+  /* BADGE */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+  .badge-blue { background: rgba(0,52,120,.12); color: var(--azul); }
+
+  /* NPS CHECK */
+  .nps-check { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); margin-top: 10px; font-size: 13px; }
+  .nps-check input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--azul); cursor: pointer; }
+
+  /* DESCUENTOS TABLE */
+  .desc-add { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--blanco); border-radius: 14px; padding: 28px; width: 500px; max-width: 96vw; box-shadow: 0 8px 40px rgba(0,0,0,.2); max-height: 90vh; overflow-y: auto; }
+  .modal h3 { font-size: 16px; font-weight: 700; color: var(--azul); margin-bottom: 18px; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+  /* TABLA REBATES */
+  .rebate-tabla { width: 100%; border-collapse: collapse; font-size: 13px; margin: 14px 0; }
+  .rebate-tabla th { background: var(--azul); color: #fff; padding: 8px 12px; text-align: center; }
+  .rebate-tabla td { padding: 8px 12px; text-align: center; border-bottom: 1px solid var(--border); }
+  .rebate-tabla tr.highlight td { background: rgba(26,158,92,.1); font-weight: 700; color: var(--verde); }
+
+  /* CHART */
+  .chart-wrap { position: relative; height: 320px; }
+
+  /* RESUMEN SUCURSAL */
+  .suc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .suc-card { background: var(--blanco); border-radius: 10px; padding: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .suc-name { font-size: 13px; font-weight: 700; color: var(--azul); margin-bottom: 10px; border-bottom: 2px solid var(--azul); padding-bottom: 6px; }
+  .suc-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 3px 0; }
+  .suc-row span:first-child { color: #6B7A8D; }
+
+  /* FORD+ SECTION */
+  .fp-score-box { display:flex; align-items:center; gap:24px; background:var(--gris); border-radius:12px; padding:20px 24px; margin-bottom:20px; flex-wrap:wrap; }
+  .fp-score-main { text-align:center; }
+  .fp-score-num { font-size:46px; font-weight:900; color:var(--azul); line-height:1; }
+  .fp-score-max { font-size:14px; color:#8A95A3; }
+  .fp-cat-badge { padding:8px 20px; border-radius:30px; font-size:15px; font-weight:900; letter-spacing:.05em; }
+  .fp-cat-gold   { background:#FFF3CD; color:#856404; border:2px solid #D4A017; }
+  .fp-cat-silver { background:#E9ECEF; color:#495057; border:2px solid #8A95A3; }
+  .fp-cat-bronze { background:#FDE8D8; color:#8B4513; border:2px solid #CD7F32; }
+  .fp-cat-none   { background:var(--border); color:#6B7A8D; border:2px solid var(--border); }
+  .fp-prog-wrap  { flex:1; min-width:220px; }
+  .fp-prog-label { display:flex; justify-content:space-between; font-size:12px; color:#4A5568; margin-bottom:5px; font-weight:600; }
+  .fp-prog-track { background:#DDE2EA; border-radius:20px; height:12px; position:relative; overflow:visible; }
+  .fp-prog-fill  { height:100%; border-radius:20px; transition:width .4s; background:var(--azul); }
+  .fp-prog-mark  { position:absolute; top:-4px; width:3px; height:20px; border-radius:2px; }
+  .fp-prog-mark.gold   { background:#D4A017; }
+  .fp-prog-mark.silver { background:#8A95A3; }
+
+  .fp-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:14px; }
+  .fp-card { background:var(--blanco); border:1px solid var(--border); border-radius:11px; padding:16px 18px; box-shadow:var(--shadow); position:relative; }
+  .fp-card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+  .fp-card-name { font-size:13px; font-weight:700; color:var(--azul); line-height:1.3; }
+  .fp-card-max  { font-size:11px; color:#8A95A3; font-weight:600; white-space:nowrap; margin-left:8px; }
+  .fp-pts-badge { font-size:22px; font-weight:900; margin-top:4px; }
+  .fp-pts-badge.full { color:var(--verde); }
+  .fp-pts-badge.half { color:var(--amarillo); }
+  .fp-pts-badge.zero { color:var(--rojo); }
+  .fp-pts-badge.idle { color:#CCD0D8; }
+  .fp-pts-label { font-size:11px; color:#8A95A3; }
+  .fp-input-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+  .fp-input-row label { font-size:12px; color:#4A5568; font-weight:600; white-space:nowrap; }
+  .fp-input-row input[type=number] { border:1px solid var(--border); border-radius:6px; padding:6px 10px; font-size:13px; width:90px; }
+  .fp-input-row input:focus { outline:none; border-color:var(--celeste); box-shadow:0 0 0 3px rgba(26,143,209,.12); }
+  .fp-select { border:1px solid var(--border); border-radius:6px; padding:6px 10px; font-size:13px; color:var(--text); }
+  .fp-select:focus { outline:none; border-color:var(--celeste); }
+  .fp-hint { font-size:11px; color:#8A95A3; margin-top:6px; line-height:1.5; }
+  .fp-pts-right { text-align:right; }
+
+  .fp-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  .fp-table th { background:var(--azul); color:#fff; padding:9px 12px; text-align:left; font-size:11px; font-weight:600; }
+  .fp-table td { padding:8px 12px; border-bottom:1px solid var(--border); }
+  .fp-table tr:last-child td { border-bottom:none; }
+  .fp-table tr:hover td { background:rgba(0,52,120,.03); }
+  .fp-q-sel { display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
+  .fp-q-btn { padding:6px 16px; border-radius:20px; border:1px solid var(--border); background:var(--blanco); font-size:12px; font-weight:600; cursor:pointer; color:#6B7A8D; transition:all .15s; }
+  .fp-q-btn.active { background:var(--azul); color:#fff; border-color:var(--azul); }
+  .fp-q-btn:hover:not(.active) { border-color:var(--azul); color:var(--azul); }
+
+  /* NPS SECTION */
+  .nps-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+  .nps-badge { background: var(--azul); color:#fff; border-radius:7px; padding:6px 14px; font-size:12px; font-weight:700; white-space:nowrap; }
+  .nps-section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#8A95A3; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+
+  .nps-kpis { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin-bottom:22px; }
+  .nps-kpi { background:var(--blanco); border:1px solid var(--border); border-radius:12px; padding:16px 18px; position:relative; overflow:hidden; box-shadow:var(--shadow); }
+  .nps-kpi::before { content:''; position:absolute; top:0;left:0;right:0; height:4px; border-radius:12px 12px 0 0; }
+  .nps-kpi.nv::before { background:var(--verde); }
+  .nps-kpi.na::before { background:var(--amarillo); }
+  .nps-kpi.nr::before { background:var(--rojo); }
+  .nps-kpi.nb::before { background:var(--azul); }
+  .nps-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:#8A95A3; font-weight:600; margin-bottom:7px; }
+  .nps-kpi-val { font-size:28px; font-weight:900; line-height:1; letter-spacing:-.03em; }
+  .nps-kpi.nv .nps-kpi-val { color:var(--verde); }
+  .nps-kpi.na .nps-kpi-val { color:var(--amarillo); }
+  .nps-kpi.nr .nps-kpi-val { color:var(--rojo); }
+  .nps-kpi.nb .nps-kpi-val { color:var(--azul); }
+  .nps-kpi-sub  { margin-top:5px; font-size:11px; color:#8A95A3; font-family:monospace; }
+  .nps-kpi-status { margin-top:6px; font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
+  .nps-kpi.nv .nps-kpi-status { color:var(--verde); }
+  .nps-kpi.na .nps-kpi-status { color:var(--amarillo); }
+  .nps-kpi.nr .nps-kpi-status { color:var(--rojo); }
+  .nps-kpi.nb .nps-kpi-status { color:var(--azul); }
+
+  .nps-tbl-wrap { background:var(--blanco); border:1px solid var(--border); border-radius:12px; overflow:auto; margin-bottom:20px; box-shadow:var(--shadow); }
+  .nps-tbl { width:100%; border-collapse:collapse; font-size:12px; min-width:980px; }
+  .nps-tbl thead tr:first-child { background:var(--azul); }
+  .nps-tbl thead tr:first-child th { padding:9px 11px; font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,.8); font-weight:600; text-align:center; border-bottom:1px solid rgba(255,255,255,.15); }
+  .nps-tbl thead tr:last-child { background:#EEF3FB; }
+  .nps-tbl thead tr:last-child th { padding:7px 9px; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:#4A5568; font-weight:600; text-align:center; border-bottom:2px solid var(--border); white-space:nowrap; }
+  .nps-tbl td { padding:9px 10px; border-top:1px solid var(--border); text-align:center; font-size:12px; font-family:monospace; }
+  .nps-tbl tr:hover td { background:rgba(0,52,120,.025); }
+  .nps-tbl td.col-suc { text-align:left; font-family:'Segoe UI',Arial,sans-serif; font-weight:700; font-size:13px; padding-left:16px; white-space:nowrap; }
+  .nps-tbl tr.grupo-row td { background:#F0F4FA; border-top:2px solid var(--border); font-weight:700; }
+  .nps-tbl tr.grupo-row td.col-suc { color:var(--azul); }
+
+  /* NPS column color groups */
+  .bg-nc  { background:rgba(0,52,120,.04) !important; }
+  .bg-nm  { background:rgba(26,158,92,.04) !important; }
+  .bg-ft  { background:rgba(212,160,23,.04) !important; }
+  .bg-gp  { background:rgba(107,122,141,.04) !important; }
+  .bdr-nc { border-left:2px solid rgba(0,52,120,.2) !important; }
+  .bdr-nm { border-left:2px solid rgba(26,158,92,.2) !important; }
+  .bdr-ft { border-left:2px solid rgba(212,160,23,.2) !important; }
+  .bdr-gp { border-left:2px solid rgba(107,122,141,.2) !important; }
+
+  .vg { color:var(--verde); font-weight:600; }
+  .va { color:var(--amarillo); font-weight:600; }
+  .vr { color:var(--rojo); font-weight:600; }
+  .vm { color:#8A95A3; }
+  .gap-ok   { color:var(--verde); font-size:11px; }
+  .gap-need { color:var(--amarillo); font-size:11px; font-weight:600; }
+
+  .nps-rank-num { font-weight:900; font-size:14px; width:42px; }
+  .nps-asesor { text-align:left !important; font-family:'Segoe UI',Arial,sans-serif !important; font-weight:600; font-size:13px !important; }
+  .nps-suctag { font-size:11px; color:#8A95A3; font-family:'Segoe UI',Arial,sans-serif !important; }
+
+  /* TOAST */
+  #toast { position: fixed; bottom: 28px; right: 28px; background: #1C2A3A; color: #fff; padding: 12px 20px; border-radius: 9px; font-size: 13px; font-weight: 600; z-index: 9999; opacity: 0; transition: opacity .3s; pointer-events: none; }
+  #toast.show { opacity: 1; }
+
+  /* FOOTER */
+  .footer { text-align: center; color: #9AA5B4; font-size: 11px; padding: 30px 0 18px; }
+
+  /* INFO BOX */
+  .info-box { background: #EFF8FF; border: 1px solid #BEE3F8; border-radius: 8px; padding: 12px 16px; font-size: 12.5px; color: #2C5282; line-height: 1.6; margin: 12px 0; }
+  .info-box strong { color: #1A365D; }
+
+  /* PROGRESS BAR */
+  .progress-wrap { background: #E5E8EE; border-radius: 20px; height: 10px; margin: 6px 0; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 20px; transition: width .4s; }
+  .progress-fill.verde { background: var(--verde); }
+  .progress-fill.amarillo { background: var(--amarillo); }
+  .progress-fill.rojo { background: var(--rojo); }
+</style>
+</head>
+<body>
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">&#9646; FORD</div>
+    <div class="login-sub">Grupo Curifor &mdash; Post Venta</div>
+    <hr class="login-divider"/>
+    <h2>Dashboard KPI Ford 2026</h2>
+    <div class="login-field">
+      <label>Correo institucional</label>
+      <input type="email" id="login-email" placeholder="tucorreo@curifor.com" autocomplete="email"/>
+    </div>
+    <div class="login-field">
+      <label>Contrase&ntilde;a</label>
+      <input type="password" id="login-pwd" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password"/>
+    </div>
+    <button class="login-btn" onclick="loginCheck()">Ingresar</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-footer">Acceso restringido al personal de Curifor S.A.</div>
+  </div>
+</div>
+
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="ford-logo">F</div>
+    <div>
+      <h1>Dashboard Post Venta Ford 2026</h1>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <select class="ctrl" id="selMes" onchange="cambiarMes()">
+      <option value="2026-01">Enero 2026</option>
+      <option value="2026-02">Febrero 2026</option>
+      <option value="2026-03">Marzo 2026</option>
+      <option value="2026-04">Abril 2026</option>
+      <option value="2026-05">Mayo 2026</option>
+      <option value="2026-06">Junio 2026</option>
+      <option value="2026-07">Julio 2026</option>
+      <option value="2026-08">Agosto 2026</option>
+      <option value="2026-09">Septiembre 2026</option>
+      <option value="2026-10">Octubre 2026</option>
+      <option value="2026-11">Noviembre 2026</option>
+      <option value="2026-12">Diciembre 2026</option>
+    </select>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard')">📊 Dashboard</div>
+  <div class="tab" onclick="showTab('compra')">🛒 Incentivo Compra</div>
+  <div class="tab" onclick="showTab('descuentos')">🏷️ Descuentos Especiales</div>
+  <div class="tab" onclick="showTab('historico')">📈 Histórico</div>
+  <div class="tab" onclick="showTab('fordplus')">🏆 Ford+</div>
+  <div class="tab" onclick="showTab('srp')">🔧 SRP 4.0</div>
+  <div class="tab" onclick="showTab('nps')">⭐ NPS & FTFR</div>
+  <div class="tab" onclick="showTab('referencia')">📋 Referencia Política</div>
+</div>
+
+<main>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div class="section active" id="sec-dashboard">
+
+  <div class="cards" id="cards-resumen">
+    <div class="card" id="card-cumplimiento">
+      <div class="card-label">Cumpl. Compra</div>
+      <div class="card-value" id="cv-cumplimiento">—</div>
+      <div class="card-sub">vs. objetivo mensual</div>
+    </div>
+    <div class="card" id="card-rebate">
+      <div class="card-label">Rebate Base</div>
+      <div class="card-value" id="cv-rebate">—</div>
+      <div class="card-sub">% sobre BLM</div>
+    </div>
+    <div class="card" id="card-bonus">
+      <div class="card-label">Bonus NPS</div>
+      <div class="card-value" id="cv-bonus">—</div>
+      <div class="card-sub">NPS ≥83% + tasa ≥18%</div>
+    </div>
+    <div class="card" id="card-monto">
+      <div class="card-label">Monto Rebate Est.</div>
+      <div class="card-value" id="cv-monto">—</div>
+      <div class="card-sub">sobre BLM calculado</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>🏢 Grupo Curifor — <span id="dash-mes-label">Mes actual</span></h2>
+    <div class="suc-grid" id="suc-grid-resumen"></div>
+  </div>
+
+  <div class="info-box">
+    <strong>Circular FCSD CC 06 – 2026 · Vigente desde 01/01/2026.</strong><br>
+    Política reemplaza circular FCSD 02 – 2025. Consultas: Gerente de Zona · rleonpor@ford.com · fpostven@ford.com
+  </div>
+</div>
+
+<!-- ===================== INCENTIVO COMPRA ===================== -->
+<div class="section" id="sec-compra">
+
+  <div class="panel">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;background:#f0f4f8;border-radius:8px;padding:10px 14px;">
+      <span style="font-size:13px;font-weight:700;color:#4A5568;">Sucursal:</span>
+      <select style="border:1px solid #CBD5E0;border-radius:6px;padding:5px 10px;font-size:13px;color:#2D3748;background:#fff;cursor:pointer;" onchange="_sucActual=this.value; cargarPagina();">
+        <option>Curifor Chillan</option>
+        <option>Curifor Curico</option>
+        <option>Curifor Linderos</option>
+        <option>Curifor Rancagua</option>
+      </select>
+    </div>
+    <h2>🛒 Incentivo Mensual por Cumplimiento de Compra</h2>
+
+    <div class="info-box">
+      Rebate calculado sobre <strong>BLM = Total Comprado – Garantías (GNM) – Notas de Crédito (NCM)</strong>.
+      Incluye repuestos, lubricantes y accesorios. El Gerente de Zona notifica el objetivo mensual a cada concesionario.
+    </div>
+
+    <h3>📥 Ingreso de Datos del Mes</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Meta de Compra Mensual ($)</label>
+        <input type="number" id="in-meta" placeholder="0" oninput="calcularCompra()">
+      </div>
+      <div class="form-group">
+        <label>Total Comprado ($)</label>
+        <input type="number" id="in-comprado" placeholder="0" oninput="calcularCompra()">
+      </div>
+      <div class="form-group">
+        <label>Garantías Notificadas — GNM ($)</label>
+        <input type="number" id="in-gnm" placeholder="0" oninput="calcularCompra()">
+      </div>
+      <div class="form-group">
+        <label>Notas de Crédito — NCM ($)</label>
+        <input type="number" id="in-ncm" placeholder="0" oninput="calcularCompra()">
+      </div>
+      <div class="form-group">
+        <label>BLM calculado ($)</label>
+        <input type="text" id="in-blm" readonly placeholder="Automático">
+      </div>
+      <div class="form-group">
+        <label>% Cumplimiento</label>
+        <input type="text" id="in-pct" readonly placeholder="Automático">
+      </div>
+    </div>
+
+    <div class="formula-box">BLM = Total Comprado – GNM – NCM</div>
+
+    <h3>⭐ Bonus NPS (condición adicional +1%)</h3>
+    <div class="nps-check">
+      <input type="checkbox" id="chk-nps" onchange="calcularCompra()">
+      <label for="chk-nps" style="cursor:pointer; font-size:13px;">
+        NPS ≥ <strong>83%</strong> y tasa de respuesta ≥ <strong>18%</strong> (confirmado por Gerente de Zona)
+      </label>
+    </div>
+    <div class="form-grid" style="margin-top:12px;">
+      <div class="form-group">
+        <label>NPS del mes (%)</label>
+        <input type="number" id="in-nps" placeholder="0.0" step="0.1" oninput="calcularCompra()">
+      </div>
+      <div class="form-group">
+        <label>Tasa de Respuesta (%)</label>
+        <input type="number" id="in-tasa" placeholder="0.0" step="0.1" oninput="calcularCompra()">
+      </div>
+    </div>
+
+    <div class="rebate-box" id="rebate-result">
+      <div class="rebate-icon">📦</div>
+      <div>
+        <div class="rebate-pct" id="rebate-pct-val">—</div>
+        <div class="rebate-detail" id="rebate-detail-txt">Ingresa los datos para calcular el rebate</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="guardarCompra()">💾 Guardar datos del mes</button>
+      <button class="btn btn-outline" onclick="limpiarCompra()">🗑️ Limpiar</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>📊 Tabla de Rebates — Referencia</h2>
+    <table class="rebate-tabla" id="tabla-rebates-ref">
+      <thead>
+        <tr><th>Cumplimiento Mensual</th><th>% Rebate Base</th><th>Con Bonus NPS (+1%)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>≥ 110%</td><td>5,0%</td><td>6,0%</td></tr>
+        <tr><td>100% – 109,9%</td><td>4,0%</td><td>5,0%</td></tr>
+        <tr><td>&lt; 100%</td><td>0,0%</td><td>0,0%</td></tr>
+      </tbody>
+    </table>
+    <div class="info-box" style="margin-top:12px;">
+      <strong>Proceso de pago:</strong> El coordinador de Revenue Management calcula el cumplimiento → Gerente de Zona notifica monto aprobado → concesionario emite factura a <em>rleonpor@ford.com y fpostven@ford.com</em> dentro de <strong>60 días</strong> (o hasta el 15/feb del año siguiente). Adjuntar copia de factura + correo de notificación de incentivos.
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DESCUENTOS ESPECIALES ===================== -->
+<div class="section" id="sec-descuentos">
+  <div class="panel">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;background:#f0f4f8;border-radius:8px;padding:10px 14px;">
+      <span style="font-size:13px;font-weight:700;color:#4A5568;">Sucursal:</span>
+      <select style="border:1px solid #CBD5E0;border-radius:6px;padding:5px 10px;font-size:13px;color:#2D3748;background:#fff;cursor:pointer;" onchange="_sucActual=this.value; cargarPagina();">
+        <option>Curifor Chillan</option>
+        <option>Curifor Curico</option>
+        <option>Curifor Linderos</option>
+        <option>Curifor Rancagua</option>
+      </select>
+    </div>
+    <h2>🏷️ Descuentos Especiales a Clientes Finales</h2>
+    <div class="info-box">
+      Permite otorgar descuentos en repuestos a clientes finales (venta directa o reparaciones de alto monto).
+      El concesionario debe aportar <strong>mínimo 10%</strong>. Presupuesto limitado y compartido por la red.
+      Solo pueden solicitar: Gerente de Postventa, Gerente de Repuestos o Focal Point.
+    </div>
+    <div class="desc-add">
+      <button class="btn btn-primary" onclick="abrirModalDescuento()">➕ Nueva solicitud</button>
+    </div>
+    <div id="tabla-descuentos-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Código Repuesto</th>
+            <th>Cliente Final</th>
+            <th>Desc. Concesionario</th>
+            <th>Desc. Ford Solicitado</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-descuentos">
+          <tr><td colspan="8" style="text-align:center; color:#8A95A3; padding:20px;">Sin solicitudes registradas</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>📋 Proceso para Descuentos Especiales</h2>
+    <div style="font-size:13px; line-height:1.8; color:#4A5568;">
+      <p><strong>Requisitos para solicitar:</strong></p>
+      <ol style="margin: 8px 0 14px 20px;">
+        <li>Código(s) de repuesto(s) requeridos</li>
+        <li>Cantidad requerida</li>
+        <li>Nombre del cliente final</li>
+        <li>Descuento total desglosado (concesionario mín. 10% + adicional Ford)</li>
+      </ol>
+      <p><strong>Una vez aprobado:</strong> emitir factura a Ford Chile por el valor del descuento autorizado en máximo <strong>60 días corridos</strong>.</p>
+      <p style="margin-top:8px;"><strong>Documentos a enviar:</strong> aprobación del descuento · factura de compra Ford Chile · factura de venta cliente final · factura a Ford por monto del descuento.</p>
+      <p style="margin-top:8px;">📧 Enviar a: <strong>rleonpor@ford.com</strong> y <strong>fpostven@ford.com</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== HISTÓRICO ===================== -->
+<div class="section" id="sec-historico">
+  <div class="panel">
+    <h2>📈 Histórico Anual — Cumplimiento de Compra 2026</h2>
+    <div style="display:flex; gap:10px; margin-bottom:4px; flex-wrap:wrap; align-items:center;">
+      <span style="font-size:12px; color:#8A95A3;">Grupo Curifor — 4 sucursales · % Cumplimiento mensual de compra</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="chartHistorico"></canvas>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>💰 Acumulado Rebates 2026 — Todas las Sucursales</h2>
+    <div class="suc-grid" id="acum-suc-grid"></div>
+  </div>
+</div>
+
+<!-- ===================== FORD+ POSTVENTA ===================== -->
+<div class="section" id="sec-fordplus">
+
+  <div class="panel">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;background:#f0f4f8;border-radius:8px;padding:10px 14px;">
+      <span style="font-size:13px;font-weight:700;color:#4A5568;">Sucursal:</span>
+      <select style="border:1px solid #CBD5E0;border-radius:6px;padding:5px 10px;font-size:13px;color:#2D3748;background:#fff;cursor:pointer;" onchange="_sucActual=this.value; cargarPagina();">
+        <option>Curifor Chillan</option>
+        <option>Curifor Curico</option>
+        <option>Curifor Linderos</option>
+        <option>Curifor Rancagua</option>
+      </select>
+    </div>
+    <h2>🏆 Gestión Ford+ — Indicadores Postventa 2026</h2>
+
+    <!-- Selector trimestre -->
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+      <span style="font-size:13px; font-weight:700; color:#4A5568;">Trimestre evaluado:</span>
+      <div class="fp-q-sel" id="fp-q-sel">
+        <button class="fp-q-btn active" onclick="selTrimestre('Q1',this)">Q1 (Ene–Mar)</button>
+        <button class="fp-q-btn" onclick="selTrimestre('Q2',this)">Q2 (Abr–Jun)</button>
+        <button class="fp-q-btn" onclick="selTrimestre('Q3',this)">Q3 (Jul–Sep)</button>
+        <button class="fp-q-btn" onclick="selTrimestre('Q4',this)">Q4 (Oct–Dic)</button>
+      </div>
+    </div>
+
+    <!-- Score resumen -->
+    <div class="fp-score-box" id="fp-score-box">
+      <div class="fp-score-main">
+        <div class="fp-score-num" id="fp-total-pts">0</div>
+        <div class="fp-score-max">/ 2.400 pts Postventa</div>
+        <div style="margin-top:8px;" id="fp-cat-wrap"><span class="fp-cat-badge fp-cat-none">Sin datos</span></div>
+      </div>
+      <div class="fp-prog-wrap">
+        <div class="fp-prog-label">
+          <span>0</span>
+          <span style="color:#CD7F32;">Bronze &lt;4.500</span>
+          <span style="color:#8A95A3;">Silver</span>
+          <span style="color:#D4A017;">Gold ≥5.400</span>
+        </div>
+        <div class="fp-prog-track" style="margin-bottom:8px;">
+          <div class="fp-prog-fill" id="fp-bar-pv" style="width:0%; background:var(--azul);"></div>
+        </div>
+        <div style="font-size:11.5px; color:#6B7A8D; line-height:1.6;">
+          Postventa aporta <strong>2.400 de 6.000 pts</strong> totales del programa.<br>
+          Categoría final (GOLD/SILVER/BRONZE) incluye también Ventas (1.600) y CX (2.000).
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón guardar -->
+    <div class="btn-row" style="margin-bottom:22px;">
+      <button class="btn btn-primary" onclick="guardarFordPlus()">💾 Guardar indicadores</button>
+      <button class="btn btn-outline" onclick="limpiarFordPlus()">🗑️ Limpiar</button>
+    </div>
+
+    <!-- Grid de indicadores -->
+    <div class="fp-grid">
+
+      <!-- 1. PA Sales -->
+      <div class="fp-card">
+        <div class="fp-card-top">
+          <div>
+            <div class="fp-card-name">PA Sales — Ventas Retail sin Garantías</div>
+            <div class="fp-hint">Cumplimiento del objetivo de compras del Business Plan (excl. garantías)</div>
+          </div>
+          <div class="fp-pts-right">
+            <div class="fp-pts-badge idle" id="pts-pa">—</div>
+            <div class="fp-pts-label">/ 250 pts</div>
+          </div>
+        </div>
+        <div class="fp-input-row">
+          <label>% Cumplimiento</label>
+          <input type="number" id="in-pa" min="0" max="200" step="0.1" placeholder="0.0" oninput="calcFP()">
+          <span style="font-size:12px; color:#8A95A3;">%</span>
+        </div>
+        <div class="fp-hint" style="margin-top:6px;">
+          &lt;92% → 0 pts &nbsp;·&nbsp; 92–99.9% → 125 pts &nbsp;·&nbsp; ≥100% → 250 pts
+        </div>
+      </div>
+
+      <!-- 2. FIRFT -->
+      <div class="fp-card">
+        <div class="fp-card-top">
+          <div>
+            <div class="fp-card-name">FIRFT — Reparado bien a la primera vez</div>
+            <div class="fp-hint">% calidad de reparación desde la perspectiva del cliente (OneCX)</div>
+          </div>
+          <div class="fp-pts-right">
+            <div class="fp-pts-badge idle" id="pts-firft">—</div>
+            <div class="fp-pts-label">/ 200 pts</div>
+          </div>
+        </div>
+        <div class="fp-input-row">
+          <label>% FIRFT</label>
+          <input type="number" id="in-firft" min="0" max="100" step="0.1" placeholder="0.0" oninput="calcFP()">
+          <span style="font-size:12px; color:#8A95A3;">%</span>
+        </div>
+        <div class="fp-hint" style="margin-top:6px;">
+          &lt;91% → 0 pts &nbsp;·&nbsp; 91–94.9% → 100 pts &nbsp;·&nbsp; ≥95% → 200 pts
+        </div>
+      </div>
+
+      <!-- 3. SRP -->
+      <div class="fp-card">
+        <div class="fp-card-top">
+          <div>
+            <div class="fp-card-name">SRP 4.0 — Proceso de Servicio de Reparación</div>
+            <div class="fp-hint" id="srp-hint">4 indicadores; para Q1 cumplir en ≥2 de 3 meses</div>
+          </div>
+          <div class="fp-pts-right">
+            <div class="fp-pts-badge idle" id="pts-srp">—</div>
+            <div class="fp-pts-label">/ 200 pts</div>
+          </div>
+        </div>
+        <div class="fp-input-row">
+          <label>¿Cumple SRP?</label>
+          <select class="fp-select" id="in-srp" onchange="calcFP()">
+            <option value="">— Seleccionar —</option>
+            <option value="1">✅ Sí cumple</option>
+            <option value="0">❌ No cumple</option>
+          </select>
+        </div>
+        <div class="fp-hint" style="margin-top:6px;" id="srp-meses-hint">
+          Q1: 2/3 meses · Q2: 4/6 meses · Q3: 6/9 meses · Q4: 8/12 meses
+        </div>
+      </div>
+
+      <!-- 4. CROD -->
+      <div class="fp-card">
+        <div class="fp-card-top">
+          <div>
+            <div class="fp-card-name">CROD — Duración de Orden de Reparación Crítica</div>
+            <div class="fp-hint">Objetivo: ≤3 días escalamiento + ≤4 días reparación = 7 días máx.</div>
+          </div>
+          <div class="fp-pts-right">
+            <div class="fp-pts-badge idle" id="pts-crod">—</div>
+            <div class="fp-pts-label">/ 300 pts</div>
+          </div>
+        </div>
+        <div class="fp-input-row">
+          <label>¿Cumple CROD?</label>
+          <select class="fp-select" id="in-crod" onchange="calcFP()">
+            <option value="">— Seleccionar —</option>
+            <option value="1">✅ Sí cumple (≤7 días)</option>
+            <option value="0">❌ No cumple (&gt;7 días)</option>
+          </select>
+        </div>
+        <div class="fp-hint" style="margin-top:6px;">
+          Basado en reporte Sales Force · Promedia todos los casos cerrados del período
+        </div>
+      </div>
+
+      <!-- 5. OSB -->
+      <div class="fp-card">
+        <div class="fp-card-top">
+          <div>
+            <div class="fp-card-name">OSB — Reserva de Servicios en Línea</div>
+            <div class="fp-hint">% de agendamientos realizados vía reserva online sobre el total</div>
+          </div>
+          <div class="fp-pts-right">
+            <div class="fp-pts-badge idle" id="pts-osb">—</div>
+            <div class="fp-pts-label">/ 150 pts</div>
+          </div>
+        </div>
+        <div class="fp-input-row">
+          <label>% Cumplimiento</label>
+          <input type="number" id="in-osb" min="0" max="200" step="0.1" placeholder="0.0" oninput="calcFP()">
+          <span style="font-size:12px; color:#8A95A3;">%</span>
+        </div>
+        <div class="fp-hint" style="margin-top:6px;">
+          &lt;100% → 0 pts &nbsp;·&nbsp; ≥100% → 150 pts
+        </div>
+      </div>
+
+      <!-- 6. PUDL -->
+      <div class="fp-card">
+        <div class="fp-card-top">
+          <div>
+            <div class="fp-card-name">PUDL — Pickup and Delivery</div>
+            <div class="fp-hint">Cumplimiento del objetivo individual de Pick-up & Delivery del Business Plan</div>
+          </div>
+          <div class="fp-pts-right">
+            <div class="fp-pts-badge idle" id="pts-pudl">—</div>
+            <div class="fp-pts-label">/ 150 pts</div>
+          </div>
+        </div>
+        <div class="fp-input-row">
+          <label>% Cumplimiento</label>
+          <input type="number" id="in-pudl" min="0" max="200" step="0.1" placeholder="0.0" oninput="calcFP()">
+          <span style="font-size:12px; color:#8A95A3;">%</span>
+        </div>
+        <div class="fp-hint" style="margin-top:6px;">
+          &lt;90% → 0 pts &nbsp;·&nbsp; 90–99.9% → 75 pts &nbsp;·&nbsp; ≥100% → 150 pts
+        </div>
+      </div>
+
+      <!-- 7. Entrenamiento Técnico -->
+      <div class="fp-card">
+        <div class="fp-card-top">
+          <div>
+            <div class="fp-card-name">Entrenamiento Técnico</div>
+            <div class="fp-hint">% de cumplimiento sobre los objetivos de formación técnica</div>
+          </div>
+          <div class="fp-pts-right">
+            <div class="fp-pts-badge idle" id="pts-enttec">—</div>
+            <div class="fp-pts-label">/ 200 pts</div>
+          </div>
+        </div>
+        <div class="fp-input-row">
+          <label>% Cumplimiento</label>
+          <input type="number" id="in-enttec" min="0" max="100" step="0.1" placeholder="0.0" oninput="calcFP()">
+          <span style="font-size:12px; color:#8A95A3;">%</span>
+        </div>
+        <div class="fp-hint" style="margin-top:6px;">
+          &lt;90% → 0 pts &nbsp;·&nbsp; ≥90% → 200 pts
+        </div>
+      </div>
+
+      <!-- 8. Entrenamiento No Técnico -->
+      <div class="fp-card">
+        <div class="fp-card-top">
+          <div>
+            <div class="fp-card-name">Entrenamiento No Técnico de Posventa</div>
+            <div class="fp-hint">% de cumplimiento sobre los objetivos de formación no técnica</div>
+          </div>
+          <div class="fp-pts-right">
+            <div class="fp-pts-badge idle" id="pts-entnotec">—</div>
+            <div class="fp-pts-label">/ 150 pts</div>
+          </div>
+        </div>
+        <div class="fp-input-row">
+          <label>% Cumplimiento</label>
+          <input type="number" id="in-entnotec" min="0" max="100" step="0.1" placeholder="0.0" oninput="calcFP()">
+          <span style="font-size:12px; color:#8A95A3;">%</span>
+        </div>
+        <div class="fp-hint" style="margin-top:6px;">
+          &lt;85% → 0 pts &nbsp;·&nbsp; ≥85% → 150 pts
+        </div>
+      </div>
+
+      <!-- 9. Retención Dinámica -->
+      <div class="fp-card">
+        <div class="fp-card-top">
+          <div>
+            <div class="fp-card-name">Retención Dinámica 12 meses</div>
+            <div class="fp-hint">VINes únicos pagos meses 1–12 / VINes únicos pagos meses 13–24 (parque 10 años, excl. latonería/pintura/garantías)</div>
+          </div>
+          <div class="fp-pts-right">
+            <div class="fp-pts-badge idle" id="pts-ret">—</div>
+            <div class="fp-pts-label">/ 400 pts</div>
+          </div>
+        </div>
+        <div class="fp-input-row">
+          <label>% Retención</label>
+          <input type="number" id="in-ret" min="0" max="200" step="0.1" placeholder="0.0" oninput="calcFP()">
+          <span style="font-size:12px; color:#8A95A3;">%</span>
+        </div>
+        <div class="fp-hint" style="margin-top:6px;">
+          &lt;95% → 0 pts &nbsp;·&nbsp; 95–102.9% → 200 pts &nbsp;·&nbsp; ≥103% → 400 pts
+        </div>
+      </div>
+
+      <!-- 10. Duración Total OT -->
+      <div class="fp-card">
+        <div class="fp-card-top">
+          <div>
+            <div class="fp-card-name">Duración Total OT (Agenda Ford)</div>
+            <div class="fp-hint">Promedio días (Fecha conclusión – Check-In). Menor tiempo = mejor resultado.</div>
+          </div>
+          <div class="fp-pts-right">
+            <div class="fp-pts-badge idle" id="pts-ot">—</div>
+            <div class="fp-pts-label">/ 400 pts</div>
+          </div>
+        </div>
+        <div class="fp-input-row">
+          <label>% Cumplimiento</label>
+          <input type="number" id="in-ot" min="0" max="200" step="0.1" placeholder="0.0" oninput="calcFP()">
+          <span style="font-size:12px; color:#8A95A3;">%</span>
+        </div>
+        <div class="fp-hint" style="margin-top:6px;">
+          &gt;110% → 0 pts &nbsp;·&nbsp; 100–110% → 200 pts &nbsp;·&nbsp; ≤100% → 400 pts<br>
+          <em>≤100% = real ≤ objetivo (más rápido = mejor)</em>
+        </div>
+      </div>
+
+    </div><!-- /fp-grid -->
+  </div>
+
+  <!-- Tabla resumen de puntajes -->
+  <div class="panel">
+    <h2>📋 Resumen de Puntajes — <span id="fp-suc-label"></span></h2>
+    <table class="fp-table">
+      <thead>
+        <tr>
+          <th>Indicador</th>
+          <th style="text-align:center">Pts Máx</th>
+          <th style="text-align:center">Pts Obtenidos</th>
+          <th style="text-align:center">Estado</th>
+        </tr>
+      </thead>
+      <tbody id="fp-resumen-tbody">
+        <tr><td colspan="4" style="text-align:center;color:#8A95A3;padding:16px;">Ingresa los indicadores para ver el resumen</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box">
+    <strong>Evaluación trimestral acumulada.</strong> Fechas de corte formales: 30 Jun (Q2) y 31 Dic (Q4).
+    Categorías totales del programa: <strong>GOLD</strong> ≥5.400 pts · <strong>SILVER</strong> 4.500–5.399 pts · <strong>BRONZE</strong> &lt;4.500 pts (sobre 6.000 pts totales: Ventas 1.600 + Postventa 2.400 + CX 2.000).
+  </div>
+</div>
+
+<!-- ===================== SRP 4.0 ===================== -->
+<div class="section" id="sec-srp">
+
+  <!-- SCORE HEADER -->
+  <div style="display:flex; align-items:center; gap:24px; background:var(--gris); border-radius:12px; padding:20px 24px; margin-bottom:20px; flex-wrap:wrap;">
+    <div style="text-align:center; min-width:110px;">
+      <div id="srp-score-num" style="font-size:46px; font-weight:900; color:var(--azul); line-height:1;">—</div>
+      <div style="font-size:13px; color:#8A95A3; margin-top:4px;">Puntuación</div>
+    </div>
+    <div id="srp-cat-badge" style="padding:10px 24px; border-radius:30px; font-size:15px; font-weight:900; background:var(--border); color:#6B7A8D; border:2px solid var(--border);">Sin datos</div>
+    <div style="flex:1; min-width:220px;">
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:#4A5568; margin-bottom:5px; font-weight:600;">
+        <span>0</span><span style="color:var(--amarillo);">3 ítems → 50%</span><span style="color:var(--verde);">4 ítems → 100%</span>
+      </div>
+      <div style="background:#DDE2EA; border-radius:20px; height:12px; position:relative; overflow:hidden;">
+        <div id="srp-prog-fill" style="height:100%; border-radius:20px; background:var(--azul); width:0%; transition:width .4s;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:#8A95A3; margin-top:5px;">
+        <span>0 puntos</span><span>≤ 2 ítems = 0 pts</span><span>4 ítems = 100%</span>
+      </div>
+    </div>
+    <div style="font-size:12px; color:#4A5568; line-height:2;">
+      <div><strong>Trimestre:</strong> <span id="srp-trim-label">Q1 (Ene–Mar)</span></div>
+      <div><strong>Ítems logrados:</strong> <span id="srp-items-ok">—</span> / 4</div>
+      <div><strong>Estado Ford+:</strong> <span id="srp-fp-result">—</span></div>
+    </div>
+  </div>
+
+  <!-- SELECTOR TRIMESTRE -->
+  <div class="panel">
+    <h2>📅 Trimestre de Evaluación</h2>
+    <div class="fp-q-sel">
+      <button class="fp-q-btn active" id="srp-q1" onclick="setSRPQuarter(1)">Q1 · Ene–Mar</button>
+      <button class="fp-q-btn" id="srp-q2" onclick="setSRPQuarter(2)">Q2 · Abr–Jun</button>
+      <button class="fp-q-btn" id="srp-q3" onclick="setSRPQuarter(3)">Q3 · Jul–Sep</button>
+      <button class="fp-q-btn" id="srp-q4" onclick="setSRPQuarter(4)">Q4 · Oct–Dic</button>
+    </div>
+    <div class="info-box">
+      Un KPI se considera <strong>logrado</strong> si alcanza el objetivo en <strong>al menos 2 de los 3 meses</strong> del trimestre.<br>
+      <strong>≤ 2 ítems logrados → 0 puntos</strong> &nbsp;·&nbsp; <strong>3 ítems → 50% de los puntos</strong> &nbsp;·&nbsp; <strong>4 ítems → 100% de los puntos</strong>
+    </div>
+  </div>
+
+  <!-- 4 KPI CARDS -->
+  <div class="fp-grid">
+
+    <!-- KPI 1 -->
+    <div class="fp-card">
+      <div class="fp-card-top">
+        <div>
+          <div class="fp-card-name">① Reparación por Técnico Entrenado</div>
+          <div class="fp-hint">% horas garantía realizadas por técnico especialista (OWS + STARSID). Objetivo: <strong>≥ 85%</strong></div>
+        </div>
+        <div class="fp-pts-right">
+          <div id="srp-k1-badge" class="fp-pts-badge idle">—</div>
+          <div class="fp-pts-label">KPI 1</div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px;">
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k1-m1-lbl">Enero</div>
+          <input type="number" id="srp-k1-m1" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k1-m1-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k1-m2-lbl">Febrero</div>
+          <input type="number" id="srp-k1-m2" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k1-m2-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k1-m3-lbl">Marzo</div>
+          <input type="number" id="srp-k1-m3" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k1-m3-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px; font-size:12px; font-weight:700; color:#8A95A3;" id="srp-k1-result">Ingresa los datos del trimestre</div>
+    </div>
+
+    <!-- KPI 2 -->
+    <div class="fp-card">
+      <div class="fp-card-top">
+        <div>
+          <div class="fp-card-name">② Cumplimiento Programas y Recalls</div>
+          <div class="fp-hint">% vehículos con campaña abierta que recibieron reparación (Agenda Ford vs OWS, +30 días). Objetivo: <strong>≥ 85%</strong></div>
+        </div>
+        <div class="fp-pts-right">
+          <div id="srp-k2-badge" class="fp-pts-badge idle">—</div>
+          <div class="fp-pts-label">KPI 2</div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px;">
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k2-m1-lbl">Enero</div>
+          <input type="number" id="srp-k2-m1" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k2-m1-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k2-m2-lbl">Febrero</div>
+          <input type="number" id="srp-k2-m2" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k2-m2-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k2-m3-lbl">Marzo</div>
+          <input type="number" id="srp-k2-m3" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k2-m3-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px; font-size:12px; font-weight:700; color:#8A95A3;" id="srp-k2-result">Ingresa los datos del trimestre</div>
+    </div>
+
+    <!-- KPI 3 -->
+    <div class="fp-card">
+      <div class="fp-card-top">
+        <div>
+          <div class="fp-card-name">③ GTAC Cerrados en ≤ 4 Días Hábiles</div>
+          <div class="fp-hint">% diagnósticos GTAC concluidos en hasta 4 días hábiles (excluye escalamientos internos reportados por Hotline). Objetivo: <strong>≥ 90%</strong></div>
+        </div>
+        <div class="fp-pts-right">
+          <div id="srp-k3-badge" class="fp-pts-badge idle">—</div>
+          <div class="fp-pts-label">KPI 3</div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px;">
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k3-m1-lbl">Enero</div>
+          <input type="number" id="srp-k3-m1" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k3-m1-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k3-m2-lbl">Febrero</div>
+          <input type="number" id="srp-k3-m2" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k3-m2-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k3-m3-lbl">Marzo</div>
+          <input type="number" id="srp-k3-m3" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k3-m3-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px; font-size:12px; font-weight:700; color:#8A95A3;" id="srp-k3-result">Ingresa los datos del trimestre</div>
+    </div>
+
+    <!-- KPI 4 -->
+    <div class="fp-card">
+      <div class="fp-card-top">
+        <div>
+          <div class="fp-card-name">④ GTAC con Calidad de Información</div>
+          <div class="fp-hint">% GTAC abiertos con STARSID válido e información relevante de pruebas realizadas (analizado por IA). Objetivo: <strong>≥ 90%</strong></div>
+        </div>
+        <div class="fp-pts-right">
+          <div id="srp-k4-badge" class="fp-pts-badge idle">—</div>
+          <div class="fp-pts-label">KPI 4</div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px;">
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k4-m1-lbl">Enero</div>
+          <input type="number" id="srp-k4-m1" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k4-m1-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k4-m2-lbl">Febrero</div>
+          <input type="number" id="srp-k4-m2" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k4-m2-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:#8A95A3; margin-bottom:4px;" id="srp-k4-m3-lbl">Marzo</div>
+          <input type="number" id="srp-k4-m3" min="0" max="100" step="0.1" placeholder="%" style="border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:100%;" oninput="calcSRP()">
+          <div class="fp-hint" id="srp-k4-m3-st" style="margin-top:3px; min-height:14px;"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px; font-size:12px; font-weight:700; color:#8A95A3;" id="srp-k4-result">Ingresa los datos del trimestre</div>
+    </div>
+
+  </div><!-- /fp-grid -->
+
+  <!-- REQUISITOS OBLIGATORIOS -->
+  <div class="panel" style="margin-top:20px;">
+    <h2>⚠️ Requisitos Obligatorios — Monitoreados</h2>
+    <div class="info-box" style="margin-bottom:16px;">
+      Estos requisitos <strong>no suman puntaje</strong> en SRP 4.0, pero su incumplimiento puede <strong>invalidar la participación</strong>. El Ingeniero de Servicio los verifica en cada visita al concesionario.
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>FIRFT — Fix It Right First Time (% acumulado en el período)</label>
+        <input type="number" id="srp-firft" min="0" max="100" step="0.1" placeholder="Ej: 94.5" oninput="calcSRP()">
+        <div style="font-size:11px; margin-top:5px; font-weight:600;" id="srp-firft-st"></div>
+      </div>
+      <div class="form-group">
+        <label>Auditoría de Garantía (período de evaluación)</label>
+        <select id="srp-garantia" onchange="calcSRP()">
+          <option value="">— Seleccionar —</option>
+          <option value="ok">✅ Sin comentarios graves</option>
+          <option value="issues">❌ Con comentarios graves</option>
+        </select>
+        <div style="font-size:11px; margin-top:5px; font-weight:600;" id="srp-garantia-st"></div>
+      </div>
+      <div class="form-group">
+        <label>% Técnicos Nivel 1 capacitados (objetivo: 100% en 30 días)</label>
+        <input type="number" id="srp-niv1" min="0" max="100" step="0.1" placeholder="%" oninput="calcSRP()">
+        <div style="font-size:11px; margin-top:5px; font-weight:600;" id="srp-niv1-st"></div>
+      </div>
+      <div class="form-group">
+        <label>% Técnicos Nivel 2 capacitados (objetivo: 60%)</label>
+        <input type="number" id="srp-niv2" min="0" max="100" step="0.1" placeholder="%" oninput="calcSRP()">
+        <div style="font-size:11px; margin-top:5px; font-weight:600;" id="srp-niv2-st"></div>
+      </div>
+      <div class="form-group">
+        <label>% Reparaciones garantía por Especialista (objetivo: 85%)</label>
+        <input type="number" id="srp-esp" min="0" max="100" step="0.1" placeholder="%" oninput="calcSRP()">
+        <div style="font-size:11px; margin-top:5px; font-weight:600;" id="srp-esp-st"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADO FINAL -->
+  <div class="rebate-box" id="srp-result-box" style="margin-top:0; margin-bottom:20px;">
+    <div class="rebate-icon">🔧</div>
+    <div>
+      <div class="rebate-pct" id="srp-result-pct">—</div>
+      <div class="rebate-detail" id="srp-result-txt">Ingresa los datos de los 4 KPIs para calcular el resultado SRP del trimestre</div>
+    </div>
+  </div>
+
+  <!-- TABLA CAMPAÑAS FSA -->
+  <div class="panel">
+    <h2>📋 Campañas FSA Activas — Referencia (Edición Abril 2026)</h2>
+    <div class="info-box" style="margin-bottom:12px;">
+      Todo vehículo con campaña abierta que ingrese al taller debe recibir la reparación. Medición: Agenda Ford vs OWS, considerando <strong>30 días</strong> post-cierre de fecha agendada.
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>FSA</th><th>ARG</th><th>BRA</th><th style="background:#1A6BAF;">CHL ★</th><th>COL</th><th>PER</th></tr></thead>
+        <tbody>
+          <tr><td><strong>24B24</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>24B50</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>24B79</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vm">–</td></tr>
+          <tr><td><strong>24B83</strong></td><td class="vg">✓</td><td class="vm">–</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vm">–</td></tr>
+          <tr><td><strong>24P37</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>24S72</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vm">–</td><td class="vm">–</td></tr>
+          <tr><td><strong>25B08</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25B09</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25B52</strong></td><td class="vm">–</td><td class="vm">–</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25C05</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25C31</strong></td><td class="vg">✓</td><td class="vm">–</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25C43</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25C69</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25P04</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25P15</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25S15</strong></td><td class="vg">✓</td><td class="vm">–</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25S21</strong></td><td class="vg">✓</td><td class="vm">–</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25S30</strong></td><td class="vg">✓</td><td class="vm">–</td><td class="vg" style="font-weight:700;">✓</td><td class="vm">–</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25S72</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25SA3</strong></td><td class="vm">–</td><td class="vm">–</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25SB7</strong></td><td class="vg">✓</td><td class="vm">–</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+          <tr><td><strong>25SC3</strong></td><td class="vg">✓</td><td class="vg">✓</td><td class="vg" style="font-weight:700;">✓</td><td class="vg">✓</td><td class="vg">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /sec-srp -->
+
+<!-- ===================== NPS & FTFR ===================== -->
+<div class="section" id="sec-nps">
+
+  <div class="panel">
+    <div class="nps-header">
+      <div>
+        <h2 style="margin-bottom:4px;">⭐ NPS & FTFR — Red de Servicio Curifor</h2>
+        <div id="nps-meta" style="font-size:12px; color:#8A95A3; font-family:monospace;">Cargando datos...</div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <div class="nps-badge">Objetivo NPS ≥ 83% · FTFR ≥ 95%</div>
+        <button class="btn btn-primary" onclick="abrirActualizarNPS()" style="font-size:12px; padding:7px 13px;">🔄 Actualizar NPS</button>
+        <button class="btn btn-outline" onclick="abrirConfigGH()" style="font-size:12px; padding:7px 13px;" title="Configurar GitHub">⚙️</button>
+      </div>
+    </div>
+
+    <p class="nps-section-title">Resultado Consolidado del Grupo</p>
+    <div class="nps-kpis" id="nps-kpis-container">
+      <div style="color:#8A95A3; font-size:13px; grid-column:1/-1; padding:10px;">Cargando...</div>
+    </div>
+
+    <p class="nps-section-title">Detalle por Sucursal</p>
+    <div class="nps-tbl-wrap">
+    <table class="nps-tbl">
+      <thead>
+        <tr>
+          <th rowspan="2" style="text-align:left;padding-left:16px">Sucursal</th>
+          <th rowspan="2">Enc.</th>
+          <th class="bg-nc bdr-nc" colspan="5">NPS Concesionario</th>
+          <th class="bg-nm bdr-nm" colspan="5">NPS Marca</th>
+          <th class="bg-ft bdr-ft" colspan="3">FTFR</th>
+          <th class="bg-gp bdr-gp" colspan="3">Brechas al Objetivo</th>
+          <th rowspan="2">Estado</th>
+        </tr>
+        <tr>
+          <th class="bg-nc bdr-nc">Prom.</th><th class="bg-nc">Neut.</th><th class="bg-nc">Det.</th><th class="bg-nc">NPS</th><th class="bg-nc">Result.</th>
+          <th class="bg-nm bdr-nm">Prom.</th><th class="bg-nm">Neut.</th><th class="bg-nm">Det.</th><th class="bg-nm">NPS</th><th class="bg-nm">Result.</th>
+          <th class="bg-ft bdr-ft">Sí</th><th class="bg-ft">%</th><th class="bg-ft">Result.</th>
+          <th class="bg-gp bdr-gp">+Prom. Conc.</th><th class="bg-gp">+Prom. Marca</th><th class="bg-gp">+FTFR</th>
+        </tr>
+      </thead>
+      <tbody id="nps-tbody-sucursales">
+        <tr><td colspan="18" style="text-align:center;color:#8A95A3;padding:20px;">Cargando...</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p class="nps-section-title">🏆 Ranking de Asesores de Servicio</p>
+    <div class="nps-tbl-wrap">
+    <table class="nps-tbl">
+      <thead>
+        <tr>
+          <th rowspan="2">#</th>
+          <th rowspan="2" style="text-align:left">Asesor</th>
+          <th rowspan="2">Sucursal</th>
+          <th rowspan="2">OTs</th>
+          <th class="bg-nc bdr-nc" colspan="2">NPS Concesionario</th>
+          <th class="bg-nm bdr-nm" colspan="2">NPS Marca</th>
+          <th class="bg-ft bdr-ft" colspan="2">FTFR</th>
+          <th class="bg-gp bdr-gp" colspan="3">Brechas al Objetivo</th>
+        </tr>
+        <tr>
+          <th class="bg-nc bdr-nc">NPS</th><th class="bg-nc">Result.</th>
+          <th class="bg-nm bdr-nm">NPS</th><th class="bg-nm">Result.</th>
+          <th class="bg-ft bdr-ft">%</th><th class="bg-ft">Result.</th>
+          <th class="bg-gp bdr-gp">+Prom. Conc.</th><th class="bg-gp">+Prom. Marca</th><th class="bg-gp">+FTFR</th>
+        </tr>
+      </thead>
+      <tbody id="nps-tbody-asesores">
+        <tr><td colspan="13" style="text-align:center;color:#8A95A3;padding:20px;">Cargando...</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div style="font-size:11.5px; color:#8A95A3; line-height:1.8; margin-top:6px; font-family:monospace;">
+      NPS Concesionario: 4-5=Promotor | 3=Neutro | 1-2=Detractor &nbsp;·&nbsp; NPS Marca: 5=Promotor | 4=Neutro | 1-3=Detractor<br>
+      ⚠️ Si Marca es Detractor (≤3), Concesionario también se clasifica como Detractor &nbsp;·&nbsp; Si cualquier NPS &lt; 83%, ambos se marcan ✗
+    </div>
+  </div>
+
+  <div class="info-box">
+    <strong>Conexión con Incentivo de Compra:</strong> El NPS Concesionario ≥ 83% y la tasa de respuesta ≥ 18% activan el <strong>bonus +1%</strong> sobre el rebate mensual de compra. Configura estos valores en la pestaña 🛒 Incentivo Compra.
+  </div>
+</div>
+
+<!-- ===================== REFERENCIA ===================== -->
+<div class="section" id="sec-referencia">
+  <div class="panel">
+    <h2>📋 Resumen Política Comercial Ford Posventa 2026</h2>
+    <div class="info-box"><strong>Circular FCSD CC 06 – 2026 · Ford Chile · 19/01/2026</strong><br>Reemplaza circular FCSD 02 – 2025. Vigente desde el 1 de enero de 2026.</div>
+
+    <h3>1. Incentivo Mensual por Cumplimiento de Compra</h3>
+    <div style="font-size:13px; line-height:1.8; color:#4A5568; margin:10px 0;">
+      <p>Rebate mensual sobre volumen efectivamente comprado (repuestos + lubricantes + accesorios).</p>
+      <table class="rebate-tabla" style="margin:12px 0;">
+        <thead><tr><th>Cumplimiento</th><th>Rebate</th><th>Con Bonus NPS</th></tr></thead>
+        <tbody>
+          <tr><td>≥ 110%</td><td>5,0%</td><td>6,0%</td></tr>
+          <tr><td>100% – 109,9%</td><td>4,0%</td><td>5,0%</td></tr>
+          <tr><td>&lt; 100%</td><td>0,0%</td><td>0,0%</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Bonus NPS:</strong> +1% adicional si NPS ≥ 83% y tasa de respuesta ≥ 18%.</p>
+      <p style="margin-top:8px;"><strong>Fórmula BLM:</strong> BLM = Total Comprado – GNM (Garantías Notificadas al mes) – NCM (Nota de Crédito del mes)</p>
+      <p style="margin-top:8px;"><strong>Plazo facturación:</strong> 60 días desde notificación (o hasta 15/feb del año siguiente si implica cambio de año).</p>
+      <p style="margin-top:8px;"><strong>Proceso:</strong> Revenue Management calcula → Gerente de Zona notifica por correo (2ª semana del mes siguiente) → concesionario emite factura → enviar a rleonpor@ford.com y fpostven@ford.com.</p>
+    </div>
+
+    <h3>2. Beneficio de Descuentos Especiales</h3>
+    <div style="font-size:13px; line-height:1.8; color:#4A5568; margin:10px 0;">
+      <p>Permite otorgar descuentos a clientes finales en repuestos (venta directa o reparaciones de alto monto).</p>
+      <ul style="margin: 8px 0 8px 18px;">
+        <li>Concesionario debe aportar <strong>mínimo 10%</strong> de descuento.</li>
+        <li>Sujeto a aprobación y disponibilidad de los Gerentes Zonales.</li>
+        <li>Presupuesto mensual limitado y compartido por toda la red.</li>
+        <li>Solo pueden solicitar: Gerente de Postventa, Gerente de Repuestos, Focal Point.</li>
+        <li>Plazo para facturar: <strong>60 días corridos</strong> desde la aprobación.</li>
+      </ul>
+      <p><strong>Documentos requeridos para cobro:</strong> aprobación del descuento · factura compra Ford Chile · factura venta cliente final · factura a Ford por monto del descuento.</p>
+    </div>
+
+    <h3>Contactos Ford Chile</h3>
+    <div style="font-size:13px; color:#4A5568; margin-top:8px;">
+      📧 rleonpor@ford.com · fpostven@ford.com<br>
+      Firmado por: <strong>Pedro Rivera</strong> — Post Venta · Revenue Management & New Business
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- MODAL NPS ACTUALIZAR -->
+<div class="modal-overlay" id="modal-nps-update">
+  <div class="modal" style="width:560px;">
+    <!-- PASO 1: Subir archivo -->
+    <div id="nps-step1">
+      <h3>🔄 Actualizar datos NPS</h3>
+      <div class="info-box" style="margin-bottom:14px;">
+        Descarga el <strong>ExpressReport.xlsx</strong> desde FMCDealer, selecciónalo aquí y los datos se procesarán automáticamente.
+      </div>
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Período (ej: Mayo 2026)</label>
+          <input type="text" id="nps-periodo-input" placeholder="Mayo 2026">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Archivo ExpressReport.xlsx</label>
+          <input type="file" id="nps-file-input" accept=".xlsx,.xls" style="padding:7px; font-size:13px; border:1px solid var(--border); border-radius:7px; cursor:pointer;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="cerrarModalNPS()">Cancelar</button>
+        <button class="btn btn-primary" id="btn-procesar-nps" onclick="procesarExcelNPS()">⚙️ Procesar datos</button>
+      </div>
+    </div>
+
+    <!-- PASO 2: Vista previa y publicar -->
+    <div id="nps-step2" style="display:none;">
+      <h3>✅ Datos procesados — Vista previa</h3>
+      <div id="nps-preview-texto"></div>
+
+      <div style="border-top:1px solid var(--border); margin:16px 0 12px; padding-top:14px;">
+        <div style="font-size:13px; font-weight:700; color:var(--azul); margin-bottom:10px;">🔑 Configuración GitHub</div>
+        <div class="form-grid">
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Repositorio (usuario/nombre-repo)</label>
+            <input type="text" id="gh-repo" placeholder="ej: curifor/dashboard-ford">
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Token Personal de Acceso (GitHub PAT)</label>
+            <input type="password" id="gh-token" placeholder="ghp_...">
+            <span style="font-size:11px; color:#8A95A3; margin-top:3px;">Se guarda en este navegador · Permisos requeridos: <code>contents: write</code></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="volverStep1()">← Volver</button>
+        <button class="btn btn-success" id="btn-publicar-nps" onclick="publicarNPSGitHub()">🚀 Publicar en GitHub</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIG GITHUB -->
+<div class="modal-overlay" id="modal-gh-config">
+  <div class="modal" style="width:480px;">
+    <h3>⚙️ Configuración GitHub</h3>
+    <div class="info-box" style="margin-bottom:14px;">
+      Estos datos se guardan en tu navegador. El token necesita permiso <code>contents: write</code> para poder publicar los datos NPS.
+    </div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Repositorio (usuario/nombre-repo)</label>
+        <input type="text" id="cfg-gh-repo" placeholder="ej: curifor/dashboard-ford">
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Token Personal de Acceso (PAT)</label>
+        <input type="password" id="cfg-gh-token" placeholder="ghp_...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('modal-gh-config').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarConfigGH()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DESCUENTO -->
+<div class="modal-overlay" id="modal-desc">
+  <div class="modal">
+    <h3>➕ Nueva Solicitud de Descuento Especial</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Código(s) de Repuesto</label>
+        <input type="text" id="md-codigo" placeholder="Ej: AB1234-56789">
+      </div>
+      <div class="form-group">
+        <label>Cantidad</label>
+        <input type="number" id="md-cantidad" placeholder="1" min="1">
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Nombre del Cliente Final</label>
+        <input type="text" id="md-cliente" placeholder="Nombre cliente">
+      </div>
+      <div class="form-group">
+        <label>Descuento Concesionario (%)</label>
+        <input type="number" id="md-desc-conc" placeholder="mín. 10" min="10" oninput="calcDescTotal()">
+      </div>
+      <div class="form-group">
+        <label>Descuento Ford Solicitado (%)</label>
+        <input type="number" id="md-desc-ford" placeholder="0" min="0" oninput="calcDescTotal()">
+      </div>
+      <div class="form-group">
+        <label>Descuento Total (%)</label>
+        <input type="text" id="md-desc-total" readonly placeholder="Automático">
+      </div>
+      <div class="form-group">
+        <label>Estado</label>
+        <select id="md-estado">
+          <option value="Pendiente">Pendiente</option>
+          <option value="Aprobado">Aprobado</option>
+          <option value="Rechazado">Rechazado</option>
+          <option value="Facturado">Facturado</option>
+        </select>
+      </div>
+    </div>
+    <div class="info-box" style="margin-top:12px; font-size:12px;">
+      Ejemplo: 15% concesionario + 10% Ford = 25% total
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarDescuento()">Guardar Solicitud</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<div class="footer">Dashboard KPI Post Venta Ford 2026 · Grupo Curifor · Datos almacenados localmente en este navegador</div>
+
+<script>
+// ── DATA STORE ──────────────────────────────────────────────────────────────
+const STORE_KEY = 'ford_pv_2026';
+const SUCURSALES = ['Curifor Chillan','Curifor Curico','Curifor Linderos','Curifor Rancagua'];
+const MESES_LABEL = {
+  '2026-01':'Enero','2026-02':'Febrero','2026-03':'Marzo','2026-04':'Abril',
+  '2026-05':'Mayo','2026-06':'Junio','2026-07':'Julio','2026-08':'Agosto',
+  '2026-09':'Septiembre','2026-10':'Octubre','2026-11':'Noviembre','2026-12':'Diciembre'
+};
+
+function cargarStore() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; }
+}
+function guardarStore(s) { localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+
+let _sucActual = SUCURSALES[0];
+function getSucursal() { return _sucActual; }
+function getMes() { return document.getElementById('selMes').value; }
+
+function getDato(suc, mes) {
+  const s = cargarStore();
+  return (s[suc] && s[suc][mes]) ? s[suc][mes] : {};
+}
+function setDato(suc, mes, obj) {
+  const s = cargarStore();
+  if (!s[suc]) s[suc] = {};
+  s[suc][mes] = { ...(s[suc][mes] || {}), ...obj };
+  guardarStore(s);
+}
+
+// ── INIT ────────────────────────────────────────────────────────────────────
+// ── LOGIN ────────────────────────────────────────────────────────────────────
+const LOGIN_KEY = 'ford_cpv2026_auth';
+const DOMINIO   = '@curifor.com';
+const PASSWORD  = 'CPV2026';
+
+function loginCheck() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pwd   = document.getElementById('login-pwd').value;
+  const errEl = document.getElementById('login-error');
+  if (!email.endsWith(DOMINIO)) {
+    errEl.textContent = 'El correo debe terminar en @curifor.com';
+    return;
+  }
+  if (pwd !== PASSWORD) {
+    errEl.textContent = 'Contraseña incorrecta.';
+    return;
+  }
+  localStorage.setItem(LOGIN_KEY, email);
+  document.getElementById('login-overlay').style.display = 'none';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Login
+  ['login-email','login-pwd'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') loginCheck();
+    });
+  });
+  if (localStorage.getItem(LOGIN_KEY)) {
+    document.getElementById('login-overlay').style.display = 'none';
+  }
+
+  // Seleccionar mes actual
+  const now = new Date();
+  const mesActual = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const sel = document.getElementById('selMes');
+  for (let o of sel.options) if (o.value === mesActual) { o.selected = true; break; }
+  cargarPagina();
+});
+
+function cargarPagina() {
+  cargarDatosCompra();
+  renderDashboard();
+  renderDescuentos();
+}
+
+function cambiarSucursal() { cargarPagina(); }
+function cambiarMes() { cargarPagina(); }
+
+// ── TABS ────────────────────────────────────────────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'historico') renderHistorico();
+  if (id === 'fordplus')  cargarFordPlus();
+  if (id === 'nps') cargarNPSData();
+}
+
+// ── SRP 4.0 ─────────────────────────────────────────────────────────────────
+var srpQuarter = 1;
+var srpMonthNames = {
+  1: ['Enero','Febrero','Marzo'],
+  2: ['Abril','Mayo','Junio'],
+  3: ['Julio','Agosto','Septiembre'],
+  4: ['Octubre','Noviembre','Diciembre']
+};
+var srpQuarterLabels = {
+  1: 'Q1 (Ene–Mar)', 2: 'Q2 (Abr–Jun)',
+  3: 'Q3 (Jul–Sep)', 4: 'Q4 (Oct–Dic)'
+};
+// KPI targets: [KPI1, KPI2, KPI3, KPI4]
+var srpTargets = [85, 85, 90, 90];
+
+function setSRPQuarter(q) {
+  srpQuarter = q;
+  [1,2,3,4].forEach(function(i) {
+    var btn = document.getElementById('srp-q'+i);
+    if (btn) btn.classList.toggle('active', i === q);
+  });
+  var months = srpMonthNames[q];
+  [1,2,3,4].forEach(function(k) {
+    [1,2,3].forEach(function(m) {
+      var lbl = document.getElementById('srp-k'+k+'-m'+m+'-lbl');
+      if (lbl) lbl.textContent = months[m-1];
+    });
+  });
+  var trimLbl = document.getElementById('srp-trim-label');
+  if (trimLbl) trimLbl.textContent = srpQuarterLabels[q];
+  calcSRP();
+}
+
+function calcSRP() {
+  var kpiOk = [false, false, false, false];
+
+  for (var k = 1; k <= 4; k++) {
+    var target = srpTargets[k-1];
+    var monthsOk = 0;
+    var hasData = false;
+
+    for (var m = 1; m <= 3; m++) {
+      var inp = document.getElementById('srp-k'+k+'-m'+m);
+      var stEl = document.getElementById('srp-k'+k+'-m'+m+'-st');
+      if (!inp || !stEl) continue;
+      var val = parseFloat(inp.value);
+      if (!isNaN(val) && inp.value !== '') {
+        hasData = true;
+        var ok = val >= target;
+        if (ok) monthsOk++;
+        stEl.textContent = (ok ? '✅ ' : '❌ ') + val.toFixed(1) + '%';
+        stEl.style.color = ok ? 'var(--verde)' : 'var(--rojo)';
+      } else {
+        stEl.textContent = '';
+      }
+    }
+
+    kpiOk[k-1] = hasData && (monthsOk >= 2);
+
+    var badge  = document.getElementById('srp-k'+k+'-badge');
+    var resEl  = document.getElementById('srp-k'+k+'-result');
+    if (!badge || !resEl) continue;
+
+    if (!hasData) {
+      badge.className = 'fp-pts-badge idle';
+      badge.textContent = '—';
+      resEl.textContent = 'Ingresa los datos del trimestre';
+      resEl.style.color = '#8A95A3';
+    } else if (kpiOk[k-1]) {
+      badge.className = 'fp-pts-badge full';
+      badge.textContent = '✓';
+      resEl.textContent = '✅ KPI LOGRADO — cumple objetivo en ' + monthsOk + '/3 meses';
+      resEl.style.color = 'var(--verde)';
+    } else {
+      badge.className = 'fp-pts-badge zero';
+      badge.textContent = '✗';
+      resEl.textContent = '❌ KPI NO LOGRADO — cumple en ' + monthsOk + '/3 meses (necesita ≥2)';
+      resEl.style.color = 'var(--rojo)';
+    }
+  }
+
+  // Puntaje total
+  var itemsOk = kpiOk.filter(Boolean).length;
+  var hasAnyData = false;
+  for (var k2 = 1; k2 <= 4; k2++) {
+    for (var m2 = 1; m2 <= 3; m2++) {
+      var el2 = document.getElementById('srp-k'+k2+'-m'+m2);
+      if (el2 && el2.value !== '') { hasAnyData = true; break; }
+    }
+    if (hasAnyData) break;
+  }
+
+  var scoreNum = '—', catText = 'Sin datos', catCls = '', boxCls = '', progW = 0, fpResult = '—';
+  if (hasAnyData) {
+    document.getElementById('srp-items-ok').textContent = itemsOk;
+    if (itemsOk >= 4) {
+      scoreNum = '100%'; catText = '✅ 100% de los puntos'; catCls = 'fp-cat-gold';
+      boxCls = 'verde'; progW = 100; fpResult = '✅ Cumple SRP';
+    } else if (itemsOk === 3) {
+      scoreNum = '50%'; catText = '⚡ 50% de los puntos'; catCls = 'fp-cat-silver';
+      boxCls = 'amarillo'; progW = 62; fpResult = '⚡ Cumple SRP (50%)';
+    } else {
+      scoreNum = '0 pts'; catText = '❌ 0 puntos — fuera de SRP'; catCls = 'fp-cat-none';
+      boxCls = 'rojo'; progW = Math.max(5, itemsOk * 20); fpResult = '❌ No cumple SRP';
+    }
+  } else {
+    document.getElementById('srp-items-ok').textContent = '—';
+  }
+
+  document.getElementById('srp-score-num').textContent = scoreNum;
+  var catBadge = document.getElementById('srp-cat-badge');
+  catBadge.textContent = catText;
+  catBadge.className = 'fp-cat-badge ' + catCls;
+  catBadge.style.border = '';
+  if (!catCls) { catBadge.style.background = 'var(--border)'; catBadge.style.color = '#6B7A8D'; catBadge.style.border = '2px solid var(--border)'; }
+
+  document.getElementById('srp-prog-fill').style.width = progW + '%';
+  document.getElementById('srp-fp-result').textContent = fpResult;
+
+  // Resultado box
+  var resBox = document.getElementById('srp-result-box');
+  var resPct = document.getElementById('srp-result-pct');
+  var resTxt = document.getElementById('srp-result-txt');
+  if (resBox && resPct && resTxt) {
+    resBox.className = 'rebate-box' + (boxCls ? ' ' + boxCls : '');
+    resPct.textContent = scoreNum;
+    if (!hasAnyData) {
+      resTxt.innerHTML = 'Ingresa los datos de los 4 KPIs para calcular el resultado SRP del trimestre';
+    } else if (itemsOk >= 4) {
+      resTxt.innerHTML = '<b>¡Excelencia SRP!</b> Los 4 KPIs logrados → 100% de los puntos para Ford+';
+    } else if (itemsOk === 3) {
+      resTxt.innerHTML = '<b>SRP parcial:</b> 3 de 4 KPIs logrados → 50% de los puntos para Ford+';
+    } else {
+      resTxt.innerHTML = '<b>SRP no cumplido:</b> Solo ' + itemsOk + ' de 4 KPIs logrados → 0 puntos · ≤ 2 ítems OK = sin puntaje';
+    }
+  }
+
+  // Sincronizar con Ford+ campo SRP
+  var fpSrpEl = document.getElementById('in-srp');
+  if (fpSrpEl && hasAnyData) {
+    fpSrpEl.value = (itemsOk >= 3) ? '1' : '0';
+    if (typeof calcFP === 'function') calcFP();
+  }
+
+  // FIRFT
+  var firftVal = parseFloat(document.getElementById('srp-firft').value);
+  var firftSt  = document.getElementById('srp-firft-st');
+  if (firftSt) {
+    if (!isNaN(firftVal) && document.getElementById('srp-firft').value !== '') {
+      if (firftVal >= 92) {
+        firftSt.textContent = '✅ Cumple — mínimo obligatorio 92%';
+        firftSt.style.color = 'var(--verde)';
+      } else {
+        firftSt.textContent = '❌ No cumple — ' + firftVal.toFixed(1) + '% (mín. 92%) · Puede invalidar participación en SRP';
+        firftSt.style.color = 'var(--rojo)';
+      }
+    } else { firftSt.textContent = ''; }
+  }
+
+  // Auditoría Garantía
+  var garVal = document.getElementById('srp-garantia').value;
+  var garSt  = document.getElementById('srp-garantia-st');
+  if (garSt) {
+    if (garVal === 'ok')     { garSt.textContent = '✅ Sin irregularidades detectadas'; garSt.style.color = 'var(--verde)'; }
+    else if (garVal === 'issues') { garSt.textContent = '❌ Con comentarios graves — puede invalidar participación en SRP'; garSt.style.color = 'var(--rojo)'; }
+    else { garSt.textContent = ''; }
+  }
+
+  // Nivel 1
+  var niv1 = parseFloat(document.getElementById('srp-niv1').value);
+  var niv1St = document.getElementById('srp-niv1-st');
+  if (niv1St && !isNaN(niv1) && document.getElementById('srp-niv1').value !== '') {
+    niv1St.textContent = niv1 >= 100 ? '✅ 100% de técnicos capacitados' : '⚠️ ' + niv1.toFixed(1) + '% — objetivo 100% en 30 días';
+    niv1St.style.color = niv1 >= 100 ? 'var(--verde)' : 'var(--amarillo)';
+  } else if (niv1St) { niv1St.textContent = ''; }
+
+  // Nivel 2
+  var niv2 = parseFloat(document.getElementById('srp-niv2').value);
+  var niv2St = document.getElementById('srp-niv2-st');
+  if (niv2St && !isNaN(niv2) && document.getElementById('srp-niv2').value !== '') {
+    niv2St.textContent = niv2 >= 60 ? '✅ ' + niv2.toFixed(1) + '% — cumple objetivo 60%' : '⚠️ ' + niv2.toFixed(1) + '% — objetivo 60%';
+    niv2St.style.color = niv2 >= 60 ? 'var(--verde)' : 'var(--amarillo)';
+  } else if (niv2St) { niv2St.textContent = ''; }
+
+  // Especialista
+  var esp = parseFloat(document.getElementById('srp-esp').value);
+  var espSt = document.getElementById('srp-esp-st');
+  if (espSt && !isNaN(esp) && document.getElementById('srp-esp').value !== '') {
+    espSt.textContent = esp >= 85 ? '✅ ' + esp.toFixed(1) + '% — cumple objetivo 85%' : '❌ ' + esp.toFixed(1) + '% — objetivo 85%';
+    espSt.style.color = esp >= 85 ? 'var(--verde)' : 'var(--rojo)';
+  } else if (espSt) { espSt.textContent = ''; }
+}
+
+// Inicializar labels del Q1 al cargar
+(function() {
+  var months = srpMonthNames[1];
+  [1,2,3,4].forEach(function(k) {
+    [1,2,3].forEach(function(m) {
+      var lbl = document.getElementById('srp-k'+k+'-m'+m+'-lbl');
+      if (lbl) lbl.textContent = months[m-1];
+    });
+  });
+})();
+
+// ── FORMATO ─────────────────────────────────────────────────────────────────
+function fmtMoney(v) {
+  if (!v && v !== 0) return '—';
+  return '$' + Math.round(v).toLocaleString('es-CL');
+}
+function fmtPct(v) {
+  if (!v && v !== 0) return '—';
+  return v.toFixed(1) + '%';
+}
+function semaforo(pct) {
+  if (pct >= 110) return 'verde';
+  if (pct >= 100) return 'verde';
+  if (pct >= 85) return 'amarillo';
+  return 'rojo';
+}
+
+// ── CÁLCULO COMPRA ──────────────────────────────────────────────────────────
+function calcularCompra() {
+  const meta     = parseFloat(document.getElementById('in-meta').value)     || 0;
+  const comprado = parseFloat(document.getElementById('in-comprado').value) || 0;
+  const gnm      = parseFloat(document.getElementById('in-gnm').value)      || 0;
+  const ncm      = parseFloat(document.getElementById('in-ncm').value)      || 0;
+  const nps      = parseFloat(document.getElementById('in-nps').value)      || 0;
+  const tasa     = parseFloat(document.getElementById('in-tasa').value)     || 0;
+  const chkNPS   = document.getElementById('chk-nps').checked;
+
+  const blm = Math.max(0, comprado - gnm - ncm);
+  const pct = meta > 0 ? (comprado / meta) * 100 : 0;
+
+  document.getElementById('in-blm').value = blm > 0 ? fmtMoney(blm) : '';
+  document.getElementById('in-pct').value = meta > 0 ? fmtPct(pct) : '';
+
+  // Rebate base
+  let rebBase = 0;
+  if (pct >= 110) rebBase = 5.0;
+  else if (pct >= 100) rebBase = 4.0;
+
+  // Bonus NPS
+  const npsOk = (nps >= 83 && tasa >= 18) || chkNPS;
+  const bonus = (rebBase > 0 && npsOk) ? 1.0 : 0.0;
+  const rebTotal = rebBase + bonus;
+  const montoRebate = blm * (rebTotal / 100);
+
+  // UI
+  const box = document.getElementById('rebate-result');
+  const pctEl = document.getElementById('rebate-pct-val');
+  const detEl = document.getElementById('rebate-detail-txt');
+  box.className = 'rebate-box';
+  pctEl.className = 'rebate-pct';
+
+  if (meta === 0) {
+    pctEl.textContent = '—';
+    detEl.innerHTML = 'Ingresa la meta mensual para calcular';
+    return;
+  }
+
+  if (rebTotal > 0) {
+    const color = 'verde';
+    box.classList.add(color);
+    pctEl.classList.add(color);
+    pctEl.textContent = rebTotal.toFixed(1) + '%';
+    detEl.innerHTML = `<b>Cumplimiento: ${fmtPct(pct)}</b> · BLM: ${fmtMoney(blm)}<br>
+      Rebate base: ${rebBase}% ${bonus > 0 ? '+ Bonus NPS: +1%' : ''}<br>
+      <b>Monto estimado: ${fmtMoney(montoRebate)}</b>`;
+  } else {
+    box.classList.add('rojo');
+    pctEl.classList.add('rojo');
+    pctEl.textContent = '0%';
+    detEl.innerHTML = `<b>Cumplimiento: ${fmtPct(pct)}</b> · BLM: ${fmtMoney(blm)}<br>No se alcanzó el objetivo (mín. 100%) · Rebate: $0`;
+  }
+}
+
+function guardarCompra() {
+  const meta     = parseFloat(document.getElementById('in-meta').value)     || 0;
+  const comprado = parseFloat(document.getElementById('in-comprado').value) || 0;
+  const gnm      = parseFloat(document.getElementById('in-gnm').value)      || 0;
+  const ncm      = parseFloat(document.getElementById('in-ncm').value)      || 0;
+  const nps      = parseFloat(document.getElementById('in-nps').value)      || 0;
+  const tasa     = parseFloat(document.getElementById('in-tasa').value)     || 0;
+  const chkNPS   = document.getElementById('chk-nps').checked;
+
+  const blm = Math.max(0, comprado - gnm - ncm);
+  const pct = meta > 0 ? (comprado / meta) * 100 : 0;
+  let rebBase = 0;
+  if (pct >= 110) rebBase = 5.0;
+  else if (pct >= 100) rebBase = 4.0;
+  const npsOk = (nps >= 83 && tasa >= 18) || chkNPS;
+  const bonus = (rebBase > 0 && npsOk) ? 1.0 : 0.0;
+  const rebTotal = rebBase + bonus;
+
+  setDato(getSucursal(), getMes(), { meta, comprado, gnm, ncm, nps, tasa, chkNPS, blm, pct, rebBase, bonus, rebTotal });
+  renderDashboard();
+  showToast('✅ Datos guardados correctamente');
+}
+
+function cargarDatosCompra() {
+  const d = getDato(getSucursal(), getMes());
+  document.getElementById('in-meta').value     = d.meta     || '';
+  document.getElementById('in-comprado').value = d.comprado || '';
+  document.getElementById('in-gnm').value      = d.gnm      || '';
+  document.getElementById('in-ncm').value      = d.ncm      || '';
+  document.getElementById('in-nps').value      = d.nps      || '';
+  document.getElementById('in-tasa').value     = d.tasa     || '';
+  document.getElementById('chk-nps').checked   = d.chkNPS   || false;
+  calcularCompra();
+}
+
+function limpiarCompra() {
+  ['in-meta','in-comprado','in-gnm','in-ncm','in-nps','in-tasa'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('chk-nps').checked = false;
+  calcularCompra();
+}
+
+// ── DASHBOARD ────────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const mes   = getMes();
+  const store = cargarStore();
+  document.getElementById('dash-mes-label').textContent = MESES_LABEL[mes] + ' 2026';
+
+  // ── Consolidado Grupo Curifor ──────────────────────────────────────────────
+  let totalMeta = 0, totalComprado = 0, totalGNM = 0, totalNCM = 0;
+  let totalBLM  = 0, totalMonto = 0;
+  let anyBonus  = false, hasDatos = false;
+
+  SUCURSALES.forEach(s => {
+    const d = (store[s] && store[s][mes]) ? store[s][mes] : {};
+    if (d.meta > 0 || d.comprado > 0 || d.blm > 0) {
+      hasDatos      = true;
+      totalMeta     += (d.meta     || 0);
+      totalComprado += (d.comprado || 0);
+      totalGNM      += (d.gnm      || 0);
+      totalNCM      += (d.ncm      || 0);
+      totalBLM      += (d.blm      || 0);
+      if (d.rebTotal > 0) totalMonto += (d.blm || 0) * (d.rebTotal / 100);
+      if (d.bonus)  anyBonus = true;
+    }
+  });
+
+  const pctTotal  = (hasDatos && totalMeta > 0) ? (totalComprado / totalMeta) * 100 : 0;
+  const rebPond   = (totalBLM > 0) ? (totalMonto / totalBLM) * 100 : 0;
+  const colPct    = pctTotal >= 100 ? 'verde' : (pctTotal >= 85 ? 'amarillo' : 'rojo');
+
+  // Cards consolidadas
+  const cardCumpl = document.getElementById('card-cumplimiento');
+  cardCumpl.className = 'card ' + (hasDatos ? colPct : '');
+  document.getElementById('cv-cumplimiento').textContent = hasDatos ? fmtPct(pctTotal) : '—';
+  document.querySelector('#card-cumplimiento .card-sub').textContent = 'Grupo Curifor vs. objetivo';
+
+  const cardRebate = document.getElementById('card-rebate');
+  cardRebate.className = 'card ' + (hasDatos ? (rebPond > 0 ? 'verde' : 'rojo') : '');
+  document.getElementById('cv-rebate').textContent = hasDatos ? (rebPond > 0 ? rebPond.toFixed(1) + '%' : '0%') : '—';
+  document.querySelector('#card-rebate .card-sub').textContent = '% ponderado sobre BLM total';
+
+  const cardBonus = document.getElementById('card-bonus');
+  cardBonus.className = 'card ' + (anyBonus ? 'verde' : '');
+  document.getElementById('cv-bonus').textContent = hasDatos ? (anyBonus ? '+1%' : 'No aplica') : '—';
+
+  document.getElementById('cv-monto').textContent = hasDatos ? (totalMonto > 0 ? fmtMoney(totalMonto) : '$0') : '—';
+  document.querySelector('#card-monto .card-sub').textContent = 'Rebate estimado total grupo';
+
+  // ── Grid consolidado ───────────────────────────────────────────────────────
+  const grid = document.getElementById('suc-grid-resumen');
+  grid.innerHTML = '';
+
+  // Fila resumen Curifor
+  const pctFillGrupo = Math.min(pctTotal, 130);
+  const fillColorG   = pctTotal >= 100 ? 'verde' : (pctTotal >= 85 ? 'amarillo' : 'rojo');
+  grid.innerHTML += `
+    <div class="suc-card" style="border:2px solid var(--azul); grid-column:1/-1;">
+      <div class="suc-name" style="font-size:14px;">🏢 Grupo Curifor — Consolidado</div>
+      <div class="suc-row"><span>% Cumplimiento</span><span class="semaforo s-${hasDatos ? fillColorG : 'gris'}">${hasDatos ? fmtPct(pctTotal) : 'Sin datos'}</span></div>
+      <div class="progress-wrap"><div class="progress-fill ${fillColorG}" style="width:${pctFillGrupo}%"></div></div>
+      <div class="suc-row"><span>BLM Total</span><span><strong>${totalBLM > 0 ? fmtMoney(totalBLM) : '—'}</strong></span></div>
+      <div class="suc-row"><span>Meta Total</span><span>${totalMeta > 0 ? fmtMoney(totalMeta) : '—'}</span></div>
+      <div class="suc-row"><span>Rebate Ponderado</span><span>${hasDatos ? (rebPond > 0 ? rebPond.toFixed(1)+'%' : '0%') : '—'}</span></div>
+      <div class="suc-row"><span>Monto Rebate Est.</span><span><strong>${hasDatos ? fmtMoney(totalMonto) : '—'}</strong></span></div>
+    </div>`;
+
+}
+
+// ── DESCUENTOS ───────────────────────────────────────────────────────────────
+function getDescuentos() {
+  const s = cargarStore();
+  const key = 'descuentos_' + getSucursal();
+  return s[key] || [];
+}
+function setDescuentos(arr) {
+  const s = cargarStore();
+  const key = 'descuentos_' + getSucursal();
+  s[key] = arr;
+  guardarStore(s);
+}
+
+function renderDescuentos() {
+  const arr = getDescuentos();
+  const tbody = document.getElementById('tbody-descuentos');
+  if (!arr.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#8A95A3; padding:20px;">Sin solicitudes registradas</td></tr>';
+    return;
+  }
+  const estadoColor = { 'Pendiente':'s-amarillo', 'Aprobado':'s-verde', 'Rechazado':'s-rojo', 'Facturado':'badge-blue' };
+  tbody.innerHTML = arr.map((d, i) => `
+    <tr>
+      <td>${d.fecha}</td>
+      <td><code>${d.codigo}</code></td>
+      <td>${d.cliente}</td>
+      <td>${d.descConc}%</td>
+      <td>${d.descFord}%</td>
+      <td><strong>${d.descTotal}%</strong></td>
+      <td><span class="semaforo ${estadoColor[d.estado] || 's-gris'}">${d.estado}</span></td>
+      <td>
+        <select style="font-size:11px; padding:3px 6px; border-radius:5px; border:1px solid var(--border);"
+          onchange="cambiarEstadoDesc(${i}, this.value)">
+          <option ${d.estado==='Pendiente'?'selected':''}>Pendiente</option>
+          <option ${d.estado==='Aprobado'?'selected':''}>Aprobado</option>
+          <option ${d.estado==='Rechazado'?'selected':''}>Rechazado</option>
+          <option ${d.estado==='Facturado'?'selected':''}>Facturado</option>
+        </select>
+        <button class="btn btn-danger" style="padding:3px 8px; font-size:11px; margin-left:4px;" onclick="eliminarDesc(${i})">✕</button>
+      </td>
+    </tr>`).join('');
+}
+
+function abrirModalDescuento() {
+  ['md-codigo','md-cantidad','md-cliente','md-desc-ford','md-desc-total'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('md-desc-conc').value = '';
+  document.getElementById('md-estado').value = 'Pendiente';
+  document.getElementById('modal-desc').classList.add('open');
+}
+function cerrarModal() { document.getElementById('modal-desc').classList.remove('open'); }
+
+function calcDescTotal() {
+  const c = parseFloat(document.getElementById('md-desc-conc').value) || 0;
+  const f = parseFloat(document.getElementById('md-desc-ford').value) || 0;
+  document.getElementById('md-desc-total').value = (c + f).toFixed(1) + '%';
+}
+
+function guardarDescuento() {
+  const codigo  = document.getElementById('md-codigo').value.trim();
+  const cliente = document.getElementById('md-cliente').value.trim();
+  const descConc = parseFloat(document.getElementById('md-desc-conc').value) || 0;
+  const descFord = parseFloat(document.getElementById('md-desc-ford').value) || 0;
+  const estado  = document.getElementById('md-estado').value;
+  if (!codigo || !cliente) { showToast('⚠️ Completa código de repuesto y cliente'); return; }
+  if (descConc < 10) { showToast('⚠️ El concesionario debe aportar mínimo 10%'); return; }
+  const arr = getDescuentos();
+  arr.unshift({
+    fecha: new Date().toLocaleDateString('es-CL'),
+    codigo, cliente,
+    descConc, descFord,
+    descTotal: descConc + descFord,
+    estado,
+    mes: getMes()
+  });
+  setDescuentos(arr);
+  renderDescuentos();
+  cerrarModal();
+  showToast('✅ Solicitud guardada');
+}
+
+function cambiarEstadoDesc(i, estado) {
+  const arr = getDescuentos();
+  arr[i].estado = estado;
+  setDescuentos(arr);
+  renderDescuentos();
+}
+function eliminarDesc(i) {
+  if (!confirm('¿Eliminar esta solicitud?')) return;
+  const arr = getDescuentos();
+  arr.splice(i, 1);
+  setDescuentos(arr);
+  renderDescuentos();
+  showToast('🗑️ Solicitud eliminada');
+}
+
+// ── HISTÓRICO ────────────────────────────────────────────────────────────────
+let chartInstance = null;
+function renderHistorico() {
+  const store = cargarStore();
+  const meses = Object.keys(MESES_LABEL);
+  const labels = meses.map(m => MESES_LABEL[m].substring(0,3));
+
+  // Agregar todas las sucursales por mes → Grupo Curifor
+  const dataPct = meses.map(m => {
+    let totalMeta = 0, totalComprado = 0, hasDatos = false;
+    SUCURSALES.forEach(s => {
+      const d = (store[s] && store[s][m]) ? store[s][m] : {};
+      if (d.meta > 0 || d.comprado > 0) {
+        totalMeta     += (d.meta     || 0);
+        totalComprado += (d.comprado || 0);
+        hasDatos = true;
+      }
+    });
+    return (hasDatos && totalMeta > 0) ? (totalComprado / totalMeta) * 100 : null;
+  });
+
+  const dataReb = meses.map(m => {
+    let totalBLM = 0, totalMonto = 0, hasDatos = false;
+    SUCURSALES.forEach(s => {
+      const d = (store[s] && store[s][m]) ? store[s][m] : {};
+      if (d.blm > 0 && d.rebTotal != null) {
+        totalBLM   += d.blm;
+        totalMonto += d.blm * (d.rebTotal / 100);
+        hasDatos = true;
+      }
+    });
+    return (hasDatos && totalBLM > 0) ? (totalMonto / totalBLM) * 100 : null;
+  });
+
+  const ctx = document.getElementById('chartHistorico').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Grupo Curifor — % Cumplimiento Compra',
+          data: dataPct,
+          borderColor: '#003478',
+          backgroundColor: 'rgba(0,52,120,.08)',
+          tension: .3, fill: true, yAxisID: 'y',
+          pointBackgroundColor: dataPct.map(v => v === null ? '#ccc' : v >= 100 ? '#1A9E5C' : v >= 85 ? '#D4A017' : '#C0392B'),
+          pointRadius: 5
+        },
+        {
+          label: 'Grupo Curifor — % Rebate Ponderado',
+          data: dataReb,
+          borderColor: '#1A8FD1',
+          backgroundColor: 'transparent',
+          tension: .3, fill: false, yAxisID: 'y2',
+          borderDash: [5,3], pointRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' } },
+      scales: {
+        y: { title: { display: true, text: 'Cumplimiento (%)' }, beginAtZero: false, min: 0 },
+        y2: { position: 'right', title: { display: true, text: 'Rebate Pond. (%)' }, beginAtZero: true, max: 7, grid: { drawOnChartArea: false } }
+      }
+    }
+  });
+
+  // Acumulado
+  const acumGrid = document.getElementById('acum-suc-grid');
+  acumGrid.innerHTML = '';
+  SUCURSALES.forEach(s => {
+    let totalMonto = 0; let mesesConDatos = 0;
+    meses.forEach(m => {
+      const d = (store[s] && store[s][m]) ? store[s][m] : {};
+      if (d.blm && d.rebTotal) { totalMonto += d.blm * (d.rebTotal / 100); mesesConDatos++; }
+    });
+    acumGrid.innerHTML += `
+      <div class="suc-card">
+        <div class="suc-name">${s}</div>
+        <div class="suc-row"><span>Meses con datos</span><span>${mesesConDatos} / 12</span></div>
+        <div class="suc-row"><span>Rebate acumulado est.</span><span><strong>${fmtMoney(totalMonto)}</strong></span></div>
+      </div>`;
+  });
+}
+
+// ── FORD+ POSTVENTA ──────────────────────────────────────────────────────────
+
+const FP_STORE = 'ford_plus_2026';
+let fpTrimestre = 'Q1';
+
+const FP_INDICADORES = [
+  { id:'pa',      label:'PA Sales (Ventas Retail sin Garantías)', max:250 },
+  { id:'firft',   label:'FIRFT (Reparado bien a la primera vez)', max:200 },
+  { id:'srp',     label:'SRP 4.0 (Proceso Servicio Reparación)', max:200 },
+  { id:'crod',    label:'CROD (Duración OT Crítica)',             max:300 },
+  { id:'osb',     label:'OSB (Reserva Online)',                   max:150 },
+  { id:'pudl',    label:'PUDL (Pickup & Delivery)',               max:150 },
+  { id:'enttec',  label:'Entrenamiento Técnico',                  max:200 },
+  { id:'entnotec',label:'Entrenamiento No Técnico Posventa',      max:150 },
+  { id:'ret',     label:'Retención Dinámica 12 meses',            max:400 },
+  { id:'ot',      label:'Duración Total OT',                      max:400 },
+];
+
+function ptsPA(v)       { return v>=100?250:v>=92?125:0; }
+function ptsFIRFT(v)    { return v>=95?200:v>=91?100:0; }
+function ptsSRP(v)      { return v==='1'?200:v==='0'?0:null; }
+function ptsCROD(v)     { return v==='1'?300:v==='0'?0:null; }
+function ptsOSB(v)      { return v>=100?150:0; }
+function ptsPUDL(v)     { return v>=100?150:v>=90?75:0; }
+function ptsEntTec(v)   { return v>=90?200:0; }
+function ptsEntNoTec(v) { return v>=85?150:0; }
+function ptsRet(v)      { return v>=103?400:v>=95?200:0; }
+function ptsOT(v)       { return v<=100?400:v<=110?200:0; }
+
+function calcFP() {
+  const vals = {
+    pa:       parseFloat(document.getElementById('in-pa').value),
+    firft:    parseFloat(document.getElementById('in-firft').value),
+    srp:      document.getElementById('in-srp').value,
+    crod:     document.getElementById('in-crod').value,
+    osb:      parseFloat(document.getElementById('in-osb').value),
+    pudl:     parseFloat(document.getElementById('in-pudl').value),
+    enttec:   parseFloat(document.getElementById('in-enttec').value),
+    entnotec: parseFloat(document.getElementById('in-entnotec').value),
+    ret:      parseFloat(document.getElementById('in-ret').value),
+    ot:       parseFloat(document.getElementById('in-ot').value),
+  };
+
+  const calcs = {
+    pa:       isNaN(vals.pa)       ? null : ptsPA(vals.pa),
+    firft:    isNaN(vals.firft)    ? null : ptsFIRFT(vals.firft),
+    srp:      ptsSRP(vals.srp),
+    crod:     ptsCROD(vals.crod),
+    osb:      isNaN(vals.osb)      ? null : ptsOSB(vals.osb),
+    pudl:     isNaN(vals.pudl)     ? null : ptsPUDL(vals.pudl),
+    enttec:   isNaN(vals.enttec)   ? null : ptsEntTec(vals.enttec),
+    entnotec: isNaN(vals.entnotec) ? null : ptsEntNoTec(vals.entnotec),
+    ret:      isNaN(vals.ret)      ? null : ptsRet(vals.ret),
+    ot:       isNaN(vals.ot)       ? null : ptsOT(vals.ot),
+  };
+
+  // Actualizar badges de cada card
+  const mxMap = {pa:250,firft:200,srp:200,crod:300,osb:150,pudl:150,enttec:200,entnotec:150,ret:400,ot:400};
+  Object.entries(calcs).forEach(([key, pts]) => {
+    const el = document.getElementById('pts-' + key);
+    if (!el) return;
+    if (pts === null) { el.textContent = '—'; el.className = 'fp-pts-badge idle'; return; }
+    const mx = mxMap[key];
+    el.textContent = pts;
+    el.className = 'fp-pts-badge ' + (pts === mx ? 'full' : pts > 0 ? 'half' : 'zero');
+  });
+
+  // Total
+  const total = Object.values(calcs).reduce((s, v) => s + (v || 0), 0);
+  const filled = Object.values(calcs).filter(v => v !== null).length;
+  document.getElementById('fp-total-pts').textContent = filled > 0 ? total : '0';
+
+  // Barra de progreso (Postventa aporta 2,400 de 6,000 = 40% del total)
+  const pct = Math.min((total / 2400) * 100, 100);
+  document.getElementById('fp-bar-pv').style.width = pct + '%';
+
+  // Categoría badge (solo Postventa, orientativo)
+  const catWrap = document.getElementById('fp-cat-wrap');
+  if (filled === 0) {
+    catWrap.innerHTML = '<span class="fp-cat-badge fp-cat-none">Sin datos</span>';
+  } else if (total >= 2160) { // 90% de 2400 (aprox GOLD si el resto acompaña)
+    catWrap.innerHTML = '<span class="fp-cat-badge fp-cat-gold">🥇 Encaminado a GOLD</span>';
+  } else if (total >= 1800) { // 75%
+    catWrap.innerHTML = '<span class="fp-cat-badge fp-cat-silver">🥈 Encaminado a SILVER</span>';
+  } else {
+    catWrap.innerHTML = '<span class="fp-cat-badge fp-cat-bronze">🥉 Encaminado a BRONZE</span>';
+  }
+
+  // Tabla resumen
+  const MAX_TOTAL = 2400;
+  const tbody = document.getElementById('fp-resumen-tbody');
+  const rows = FP_INDICADORES.map(ind => {
+    const pts = calcs[ind.id];
+    const color = pts === null ? '#CCD0D8' : pts === ind.max ? 'var(--verde)' : pts > 0 ? 'var(--amarillo)' : 'var(--rojo)';
+    const estado = pts === null ? '—' : pts === ind.max ? '✅ Máximo' : pts > 0 ? '⚠️ Parcial' : '❌ 0 pts';
+    return `<tr>
+      <td>${ind.label}</td>
+      <td style="text-align:center;font-weight:700;">${ind.max}</td>
+      <td style="text-align:center;font-weight:900;color:${color};">${pts !== null ? pts : '—'}</td>
+      <td style="text-align:center;">${estado}</td>
+    </tr>`;
+  });
+  const totalColor = total >= 2160 ? 'var(--verde)' : total >= 1800 ? 'var(--amarillo)' : 'var(--rojo)';
+  rows.push(`<tr style="background:#EEF3FB; font-weight:800; border-top:2px solid var(--border);">
+    <td>TOTAL POSTVENTA</td>
+    <td style="text-align:center;">2.400</td>
+    <td style="text-align:center;font-size:16px;color:${totalColor};">${total}</td>
+    <td style="text-align:center;">${Math.round((total/2400)*100)}%</td>
+  </tr>`);
+  tbody.innerHTML = rows.join('');
+}
+
+function selTrimestre(q, btn) {
+  fpTrimestre = q;
+  document.querySelectorAll('.fp-q-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Actualizar hint SRP según trimestre
+  const hints = { Q1:'2 de 3 meses', Q2:'4 de 6 meses', Q3:'6 de 9 meses', Q4:'8 de 12 meses' };
+  document.getElementById('srp-hint').textContent = `4 indicadores; para ${q} cumplir en ≥${hints[q]}`;
+  calcFP();
+}
+
+function guardarFordPlus() {
+  const suc = getSucursal();
+  const store = cargarStore();
+  const key = 'fp_' + suc;
+  if (!store[key]) store[key] = {};
+  store[key][fpTrimestre] = {
+    pa:       document.getElementById('in-pa').value,
+    firft:    document.getElementById('in-firft').value,
+    srp:      document.getElementById('in-srp').value,
+    crod:     document.getElementById('in-crod').value,
+    osb:      document.getElementById('in-osb').value,
+    pudl:     document.getElementById('in-pudl').value,
+    enttec:   document.getElementById('in-enttec').value,
+    entnotec: document.getElementById('in-entnotec').value,
+    ret:      document.getElementById('in-ret').value,
+    ot:       document.getElementById('in-ot').value,
+    trimestre: fpTrimestre,
+  };
+  guardarStore(store);
+  showToast('✅ Indicadores Ford+ guardados');
+}
+
+function cargarFordPlus() {
+  const suc = getSucursal();
+  document.getElementById('fp-suc-label').textContent = suc + ' — ' + fpTrimestre + ' 2026';
+  const store = cargarStore();
+  const key = 'fp_' + suc;
+  const d = (store[key] && store[key][fpTrimestre]) ? store[key][fpTrimestre] : {};
+  const campos = ['pa','firft','osb','pudl','enttec','entnotec','ret','ot'];
+  campos.forEach(c => { document.getElementById('in-' + c).value = d[c] || ''; });
+  document.getElementById('in-srp').value  = d.srp  || '';
+  document.getElementById('in-crod').value = d.crod || '';
+  calcFP();
+}
+
+function limpiarFordPlus() {
+  ['pa','firft','osb','pudl','enttec','entnotec','ret','ot'].forEach(c => document.getElementById('in-'+c).value = '');
+  document.getElementById('in-srp').value = '';
+  document.getElementById('in-crod').value = '';
+  calcFP();
+}
+
+// ── NPS DINÁMICO ─────────────────────────────────────────────────────────────
+
+async function cargarNPSData() {
+  try {
+    const r = await fetch('./nps_data.json?t=' + Date.now());
+    if (r.ok) {
+      const data = await r.json();
+      localStorage.setItem('ford_nps_cache', JSON.stringify(data));
+      renderNPS(data);
+      return;
+    }
+  } catch(e) {}
+  // Fallback: caché local
+  const cached = localStorage.getItem('ford_nps_cache');
+  if (cached) {
+    renderNPS(JSON.parse(cached));
+    document.getElementById('nps-meta').textContent += ' (caché local)';
+  } else {
+    document.getElementById('nps-meta').textContent = 'Sin datos — presiona 🔄 Actualizar NPS';
+    document.getElementById('nps-tbody-sucursales').innerHTML = '<tr><td colspan="18" style="text-align:center;color:#8A95A3;padding:20px;">Sin datos cargados</td></tr>';
+    document.getElementById('nps-tbody-asesores').innerHTML = '<tr><td colspan="13" style="text-align:center;color:#8A95A3;padding:20px;">Sin datos cargados</td></tr>';
+  }
+}
+
+function cNPS(v) { return v >= 83 ? 'vg' : (v >= 75 ? 'va' : 'vr'); }
+function cFTFR(v) { return v >= 95 ? 'vg' : (v >= 90 ? 'va' : 'vr'); }
+function chipNPS(v)  { return v >= 83 ? `<span class="semaforo s-verde">✓</span>` : (v >= 75 ? `<span class="semaforo s-amarillo">△</span>` : `<span class="semaforo s-rojo">✗</span>`); }
+function chipFT(v)   { return v >= 95 ? `<span class="semaforo s-verde">✓</span>` : (v >= 90 ? `<span class="semaforo s-amarillo">△</span>` : `<span class="semaforo s-rojo">✗</span>`); }
+function chipEst(e)  { const m={'Logrado':'s-verde','Parcial':'s-amarillo','No logrado':'s-rojo'}; return `<span class="semaforo ${m[e]||'s-gris'}">${e}</span>`; }
+
+function renderNPS(data) {
+  const g = data.grupo;
+  document.getElementById('nps-meta').textContent =
+    `${data.periodo} · ${data.total_encuestas} encuestas · ${data.sucursales_activas} sucursales · Actualizado: ${data.actualizado}`;
+
+  // KPI Cards
+  const kC = v => v >= 83 ? 'nv' : (v >= 75 ? 'na' : 'nr');
+  document.getElementById('nps-kpis-container').innerHTML = `
+    <div class="nps-kpi ${kC(g.nps_conc)}">
+      <div class="nps-kpi-label">NPS Concesionario</div>
+      <div class="nps-kpi-val">${g.nps_conc.toFixed(1)}<small style="font-size:14px">%</small></div>
+      <div class="nps-kpi-sub">P=${g.prom_conc} · N=${g.neut_conc} · D=${g.det_conc} · n=${g.n_conc}</div>
+      <div class="nps-kpi-status">${g.nps_conc >= 83 ? '✓ Objetivo logrado' : '✗ Bajo objetivo'}</div>
+    </div>
+    <div class="nps-kpi ${kC(g.nps_marca)}">
+      <div class="nps-kpi-label">NPS Marca</div>
+      <div class="nps-kpi-val">${g.nps_marca.toFixed(1)}<small style="font-size:14px">%</small></div>
+      <div class="nps-kpi-sub">P=${g.prom_marca} · N=${g.neut_marca} · D=${g.det_marca} · n=${g.n_marca}</div>
+      <div class="nps-kpi-status">${g.nps_marca >= 83 ? '✓ Objetivo logrado' : '✗ Bajo objetivo'}</div>
+    </div>
+    <div class="nps-kpi ${g.ftfr >= 95 ? 'nv' : 'nr'}">
+      <div class="nps-kpi-label">FTFR</div>
+      <div class="nps-kpi-val">${g.ftfr.toFixed(1)}<small style="font-size:14px">%</small></div>
+      <div class="nps-kpi-sub">Sí=${g.ftfr_si} · No=${g.ftfr_no} · n=${g.n_ftfr}</div>
+      <div class="nps-kpi-status">${g.ftfr >= 95 ? '✓ Objetivo logrado' : '✗ Bajo objetivo'}</div>
+    </div>
+    <div class="nps-kpi nb">
+      <div class="nps-kpi-label">Encuestas Totales</div>
+      <div class="nps-kpi-val">${data.total_encuestas}</div>
+      <div class="nps-kpi-sub">${data.variacion_encuestas >= 0 ? '↑' : '↓'} ${Math.abs(data.variacion_encuestas)} vs período anterior</div>
+      <div class="nps-kpi-status">${data.sucursales_activas} sucursales activas</div>
+    </div>`;
+
+  // Tabla sucursales
+  document.getElementById('nps-tbody-sucursales').innerHTML = [
+    ...data.sucursales,
+    { nombre:'TOTAL GRUPO', encuestas:data.total_encuestas,
+      prom_conc:g.prom_conc, neut_conc:g.neut_conc, det_conc:g.det_conc, nps_conc:g.nps_conc,
+      prom_marca:g.prom_marca, neut_marca:g.neut_marca, det_marca:g.det_marca, nps_marca:g.nps_marca,
+      ftfr_si:g.ftfr_si, ftfr_pct:g.ftfr,
+      brecha_conc:null, brecha_marca:null, brecha_ftfr:null,
+      estado: g.nps_conc >= 83 && g.nps_marca >= 83 && g.ftfr >= 95 ? 'Logrado' : 'Parcial', _grupo:true }
+  ].map(s => {
+    const rc = s._grupo ? ' class="grupo-row"' : '';
+    return `<tr${rc}>
+      <td class="col-suc">${s.nombre}</td><td>${s.encuestas}</td>
+      <td class="bg-nc bdr-nc ${cNPS(s.nps_conc)}">${s.prom_conc}</td>
+      <td class="bg-nc ${s.neut_conc>0?'va':'vm'}">${s.neut_conc}</td>
+      <td class="bg-nc ${s.det_conc>0?'vr':'vm'}">${s.det_conc}</td>
+      <td class="bg-nc ${cNPS(s.nps_conc)}">${s.nps_conc.toFixed(1)}%</td>
+      <td class="bg-nc">${chipNPS(s.nps_conc)}</td>
+      <td class="bg-nm bdr-nm ${cNPS(s.nps_marca)}">${s.prom_marca}</td>
+      <td class="bg-nm ${s.neut_marca>0?'va':'vm'}">${s.neut_marca}</td>
+      <td class="bg-nm ${s.det_marca>0?'vr':'vm'}">${s.det_marca}</td>
+      <td class="bg-nm ${cNPS(s.nps_marca)}">${s.nps_marca.toFixed(1)}%</td>
+      <td class="bg-nm">${chipNPS(s.nps_marca)}</td>
+      <td class="bg-ft bdr-ft ${cFTFR(s.ftfr_pct)}">${s.ftfr_si}</td>
+      <td class="bg-ft ${cFTFR(s.ftfr_pct)}">${s.ftfr_pct.toFixed(1)}%</td>
+      <td class="bg-ft">${chipFT(s.ftfr_pct)}</td>
+      <td class="bg-gp bdr-gp ${s.brecha_conc?'gap-need':'gap-ok'}">${s.brecha_conc||'✓'}</td>
+      <td class="bg-gp ${s.brecha_marca?'gap-need':'gap-ok'}">${s.brecha_marca||'✓'}</td>
+      <td class="bg-gp ${s.brecha_ftfr?'gap-need':'gap-ok'}">${s.brecha_ftfr||'✓'}</td>
+      <td>${chipEst(s.estado)}</td>
+    </tr>`;
+  }).join('');
+
+  // Ranking asesores
+  const medals = {1:'🥇',2:'🥈',3:'🥉'};
+  const mColors = {1:'#D4A017',2:'#8A95A3',3:'#9B6B3A'};
+  document.getElementById('nps-tbody-asesores').innerHTML = data.asesores.map(a => {
+    const rs = mColors[a.rank] ? ` style="color:${mColors[a.rank]}"` : '';
+    return `<tr>
+      <td class="nps-rank-num"${rs}>${medals[a.rank]||a.rank}</td>
+      <td class="nps-asesor">${a.nombre}</td>
+      <td class="nps-suctag">${a.sucursal}</td>
+      <td>${a.ots}</td>
+      <td class="bg-nc bdr-nc ${cNPS(a.nps_conc)}">${a.nps_conc.toFixed(1)}%</td>
+      <td class="bg-nc">${chipNPS(a.nps_conc)}</td>
+      <td class="bg-nm bdr-nm ${cNPS(a.nps_marca)}">${a.nps_marca.toFixed(1)}%</td>
+      <td class="bg-nm">${chipNPS(a.nps_marca)}</td>
+      <td class="bg-ft bdr-ft ${cFTFR(a.ftfr)}">${a.ftfr.toFixed(1)}%</td>
+      <td class="bg-ft">${chipFT(a.ftfr)}</td>
+      <td class="bg-gp bdr-gp ${a.brecha_conc?'gap-need':'gap-ok'}">${a.brecha_conc||'✓'}</td>
+      <td class="bg-gp ${a.brecha_marca?'gap-need':'gap-ok'}">${a.brecha_marca||'✓'}</td>
+      <td class="bg-gp ${a.brecha_ftfr?'gap-need':'gap-ok'}">${a.brecha_ftfr||'✓'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── MODAL NPS UPDATE ─────────────────────────────────────────────────────────
+
+let npsProcessedData = null;
+
+function abrirActualizarNPS() {
+  document.getElementById('modal-nps-update').classList.add('open');
+  document.getElementById('nps-step1').style.display = 'block';
+  document.getElementById('nps-step2').style.display = 'none';
+  document.getElementById('nps-file-input').value = '';
+  npsProcessedData = null;
+  // Pre-llenar config guardada
+  const cfg = JSON.parse(localStorage.getItem('gh_config') || '{}');
+  if (cfg.repo) document.getElementById('gh-repo').value = cfg.repo;
+  if (cfg.token) document.getElementById('gh-token').value = cfg.token;
+}
+function cerrarModalNPS() { document.getElementById('modal-nps-update').classList.remove('open'); }
+function volverStep1() {
+  document.getElementById('nps-step1').style.display = 'block';
+  document.getElementById('nps-step2').style.display = 'none';
+}
+
+async function procesarExcelNPS() {
+  const file = document.getElementById('nps-file-input').files[0];
+  if (!file) { showToast('⚠️ Selecciona el archivo ExpressReport.xlsx'); return; }
+  const btn = document.getElementById('btn-procesar-nps');
+  btn.textContent = '⏳ Procesando...'; btn.disabled = true;
+
+  try {
+    const ab = await file.arrayBuffer();
+    const wb = XLSX.read(ab, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const all = XLSX.utils.sheet_to_json(ws, { header: 1 });
+    // Fila 3 (índice 2) = encabezados → datos desde índice 3
+    const rows = all.slice(3).filter(r => r && r.length > 17 && r[17]);
+
+    if (!rows.length) { showToast('⚠️ Sin datos. Verifica que sea el ExpressReport correcto.'); btn.textContent='⚙️ Procesar datos'; btn.disabled=false; return; }
+
+    const sucMap = {}, asMap = {};
+    let totEnc=0, ftfrSi=0, ftfrTotal=0;
+
+    rows.forEach(r => {
+      const suc    = (r[17]||'').toString().trim(); if (!suc) return;
+      const asesor = (r[27]||'Sin asignar').toString().trim();
+      const nC     = parseInt(r[64]);
+      const nM     = parseInt(r[67]);
+      const ftfr   = (r[116]||'').toString().toLowerCase().trim();
+      if (isNaN(nC)||isNaN(nM)) return;
+      totEnc++;
+
+      // Marca: 5=P, 4=N, 1-3=D
+      const catM = nM===5?'P':(nM===4?'N':'D');
+      // Conc: si Marca ≤3 → forzar D
+      const catC = nM<=3?'D':(nC>=4?'P':(nC===3?'N':'D'));
+      const ftfrOk = ['sí','si','yes','1','true'].includes(ftfr);
+      if (ftfr!=='') { ftfrTotal++; if (ftfrOk) ftfrSi++; }
+
+      if (!sucMap[suc]) sucMap[suc]={pC:0,nC:0,dC:0,pM:0,nM:0,dM:0,fSi:0,fTot:0,enc:0};
+      const s=sucMap[suc]; s.enc++;
+      catC==='P'?s.pC++:(catC==='N'?s.nC++:s.dC++);
+      catM==='P'?s.pM++:(catM==='N'?s.nM++:s.dM++);
+      if (ftfr!==''){s.fTot++;if(ftfrOk)s.fSi++;}
+
+      if (!asMap[asesor]) asMap[asesor]={suc,pC:0,nC:0,dC:0,pM:0,nM:0,dM:0,fSi:0,fTot:0,ots:0};
+      const a=asMap[asesor]; a.ots++;
+      catC==='P'?a.pC++:(catC==='N'?a.nC++:a.dC++);
+      catM==='P'?a.pM++:(catM==='N'?a.nM++:a.dM++);
+      if (ftfr!==''){a.fTot++;if(ftfrOk)a.fSi++;}
+    });
+
+    const pct=(p,t)=>t>0?(p/t)*100:0;
+    const brC=(n,t)=>n<83?Math.max(0,Math.ceil(83*t/100)-Math.floor(n*t/100)):null;
+
+    const sucursales = Object.entries(sucMap).map(([nombre,s])=>{
+      const tC=s.pC+s.nC+s.dC, tM=s.pM+s.nM+s.dM;
+      const npsC=pct(s.pC,tC), npsM=pct(s.pM,tM), ftP=s.fTot>0?pct(s.fSi,s.fTot):0;
+      const bC=brC(npsC,tC), bM=brC(npsM,tM);
+      const bF=ftP<95&&s.fTot>0?Math.ceil(95*s.fTot/100)-s.fSi:null;
+      const estado=npsC>=83&&npsM>=83&&ftP>=95?'Logrado':(npsC<83&&npsM<83?'No logrado':'Parcial');
+      return {nombre,encuestas:s.enc,prom_conc:s.pC,neut_conc:s.nC,det_conc:s.dC,nps_conc:+npsC.toFixed(1),
+        prom_marca:s.pM,neut_marca:s.nM,det_marca:s.dM,nps_marca:+npsM.toFixed(1),
+        ftfr_si:s.fSi,ftfr_pct:+ftP.toFixed(1),
+        brecha_conc:bC?`+${bC} prom.`:null, brecha_marca:bM?`+${bM} prom.`:null, brecha_ftfr:bF?`+${bF} FTFR`:null, estado};
+    });
+
+    const asesores = Object.entries(asMap).map(([nombre,a])=>{
+      const tC=a.pC+a.nC+a.dC, tM=a.pM+a.nM+a.dM;
+      const npsC=pct(a.pC,tC), npsM=pct(a.pM,tM), ftP=a.fTot>0?pct(a.fSi,a.fTot):0;
+      const bC=brC(npsC,tC), bM=brC(npsM,tM);
+      const bF=ftP<95&&a.fTot>0?Math.ceil(95*a.fTot/100)-a.fSi:null;
+      return {nombre,sucursal:a.suc,ots:a.ots,nps_conc:+npsC.toFixed(1),nps_marca:+npsM.toFixed(1),ftfr:+ftP.toFixed(1),
+        brecha_conc:bC?`+${bC} prom.`:null, brecha_marca:bM?`+${bM} prom.`:null, brecha_ftfr:bF?`+${bF} FTFR`:null};
+    }).sort((a,b)=>{
+      const aOk=!a.brecha_conc&&!a.brecha_marca&&!a.brecha_ftfr?1:0;
+      const bOk=!b.brecha_conc&&!b.brecha_marca&&!b.brecha_ftfr?1:0;
+      if(aOk!==bOk) return bOk-aOk;
+      return b.nps_conc-a.nps_conc||b.nps_marca-a.nps_marca||b.ftfr-a.ftfr;
+    }).map((a,i)=>({rank:i+1,...a}));
+
+    // Totales grupo
+    const tPC=sucursales.reduce((s,x)=>s+x.prom_conc,0);
+    const tNC=sucursales.reduce((s,x)=>s+x.neut_conc,0);
+    const tDC=sucursales.reduce((s,x)=>s+x.det_conc,0);
+    const tPM=sucursales.reduce((s,x)=>s+x.prom_marca,0);
+    const tNM=sucursales.reduce((s,x)=>s+x.neut_marca,0);
+    const tDM=sucursales.reduce((s,x)=>s+x.det_marca,0);
+    const nG=tPC+tNC+tDC, nGM=tPM+tNM+tDM;
+    const npsGC=+pct(tPC,nG).toFixed(1), npsGM=+pct(tPM,nGM).toFixed(1), ftG=+(ftfrTotal>0?pct(ftfrSi,ftfrTotal):0).toFixed(1);
+    const hoy=new Date(); const fecha=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+
+    npsProcessedData = {
+      periodo: document.getElementById('nps-periodo-input').value || 'Mes actual',
+      total_encuestas: totEnc, variacion_encuestas: 0,
+      sucursales_activas: Object.keys(sucMap).length, actualizado: fecha,
+      grupo: { nps_conc:npsGC, nps_marca:npsGM, ftfr:ftG,
+        prom_conc:tPC, neut_conc:tNC, det_conc:tDC, n_conc:nG,
+        prom_marca:tPM, neut_marca:tNM, det_marca:tDM, n_marca:nGM,
+        ftfr_si:ftfrSi, ftfr_no:ftfrTotal-ftfrSi, n_ftfr:ftfrTotal },
+      sucursales, asesores
+    };
+
+    // Preview
+    const cv=v=>v>=83?'var(--verde)':'var(--rojo)', cf=v=>v>=95?'var(--verde)':'var(--rojo)';
+    document.getElementById('nps-preview-texto').innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;">
+        <div style="background:var(--gris);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:11px;color:#8A95A3;margin-bottom:4px;">NPS Conc.</div>
+          <div style="font-size:22px;font-weight:900;color:${cv(npsGC)};">${npsGC}%</div>
+        </div>
+        <div style="background:var(--gris);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:11px;color:#8A95A3;margin-bottom:4px;">NPS Marca</div>
+          <div style="font-size:22px;font-weight:900;color:${cv(npsGM)};">${npsGM}%</div>
+        </div>
+        <div style="background:var(--gris);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:11px;color:#8A95A3;margin-bottom:4px;">FTFR</div>
+          <div style="font-size:22px;font-weight:900;color:${cf(ftG)};">${ftG}%</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#4A5568;">${totEnc} encuestas · ${Object.keys(sucMap).length} sucursales · ${asesores.length} asesores</div>`;
+
+    document.getElementById('nps-step1').style.display = 'none';
+    document.getElementById('nps-step2').style.display = 'block';
+
+  } catch(err) {
+    showToast('❌ Error al procesar: ' + err.message);
+    console.error(err);
+  }
+  btn.textContent = '⚙️ Procesar datos'; btn.disabled = false;
+}
+
+async function publicarNPSGitHub() {
+  if (!npsProcessedData) return;
+  const token = document.getElementById('gh-token').value.trim();
+  const repo  = document.getElementById('gh-repo').value.trim();
+  if (!token || !repo) { showToast('⚠️ Completa el repositorio y el token'); return; }
+  localStorage.setItem('gh_config', JSON.stringify({ token, repo }));
+
+  const btn = document.getElementById('btn-publicar-nps');
+  btn.textContent = '⏳ Publicando...'; btn.disabled = true;
+
+  try {
+    const url = `https://api.github.com/repos/${repo}/contents/nps_data.json`;
+    const hdrs = { 'Authorization': `token ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' };
+    // Obtener SHA actual si el archivo ya existe
+    let sha = null;
+    try { const g = await fetch(url, { headers: hdrs }); if (g.ok) { const gj = await g.json(); sha = gj.sha; } } catch(e) {}
+
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(npsProcessedData, null, 2))));
+    const res = await fetch(url, { method: 'PUT', headers: hdrs,
+      body: JSON.stringify({ message: `Actualizar NPS — ${npsProcessedData.actualizado}`, content, ...(sha?{sha}:{}) }) });
+
+    if (res.ok) {
+      localStorage.setItem('ford_nps_cache', JSON.stringify(npsProcessedData));
+      renderNPS(npsProcessedData);
+      cerrarModalNPS();
+      showToast('✅ NPS publicado en GitHub. Los cambios aparecen en ~1 min.');
+    } else {
+      const err = await res.json();
+      showToast('❌ GitHub: ' + (err.message || res.status));
+    }
+  } catch(err) { showToast('❌ Error: ' + err.message); }
+  btn.textContent = '🚀 Publicar en GitHub'; btn.disabled = false;
+}
+
+// GitHub config modal
+function abrirConfigGH() {
+  const cfg = JSON.parse(localStorage.getItem('gh_config') || '{}');
+  document.getElementById('cfg-gh-repo').value  = cfg.repo  || '';
+  document.getElementById('cfg-gh-token').value = cfg.token || '';
+  document.getElementById('modal-gh-config').classList.add('open');
+}
+function guardarConfigGH() {
+  const repo  = document.getElementById('cfg-gh-repo').value.trim();
+  const token = document.getElementById('cfg-gh-token').value.trim();
+  if (!repo || !token) { showToast('⚠️ Completa ambos campos'); return; }
+  localStorage.setItem('gh_config', JSON.stringify({ repo, token }));
+  document.getElementById('modal-gh-config').classList.remove('open');
+  showToast('✅ Configuración GitHub guardada');
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>

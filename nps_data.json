@@ -1,0 +1,34 @@
+{
+  "periodo": "Mes actual",
+  "total_encuestas": 74,
+  "variacion_encuestas": 9,
+  "sucursales_activas": 6,
+  "actualizado": "2026-05-19",
+  "grupo": {
+    "nps_conc": 90.4, "nps_marca": 83.6, "ftfr": 97.3,
+    "prom_conc": 66, "neut_conc": 1, "det_conc": 6, "n_conc": 73,
+    "prom_marca": 64, "neut_marca": 6, "det_marca": 3, "n_marca": 73,
+    "ftfr_si": 72, "ftfr_no": 2, "n_ftfr": 74
+  },
+  "sucursales": [
+    {"nombre":"Linderos","encuestas":16,"prom_conc":16,"neut_conc":0,"det_conc":0,"nps_conc":100.0,"prom_marca":15,"neut_marca":1,"det_marca":0,"nps_marca":93.8,"ftfr_si":16,"ftfr_pct":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null,"estado":"Logrado"},
+    {"nombre":"Talca","encuestas":16,"prom_conc":15,"neut_conc":0,"det_conc":1,"nps_conc":87.5,"prom_marca":15,"neut_marca":0,"det_marca":1,"nps_marca":87.5,"ftfr_si":16,"ftfr_pct":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null,"estado":"Logrado"},
+    {"nombre":"Curicó","encuestas":16,"prom_conc":15,"neut_conc":1,"det_conc":0,"nps_conc":93.8,"prom_marca":14,"neut_marca":2,"det_marca":0,"nps_marca":87.5,"ftfr_si":15,"ftfr_pct":93.8,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":"+4 FTFR","estado":"Parcial"},
+    {"nombre":"Chillán","encuestas":5,"prom_conc":5,"neut_conc":0,"det_conc":0,"nps_conc":100.0,"prom_marca":5,"neut_marca":0,"det_marca":0,"nps_marca":100.0,"ftfr_si":5,"ftfr_pct":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null,"estado":"Logrado"},
+    {"nombre":"Chillán Comerciales","encuestas":6,"prom_conc":6,"neut_conc":0,"det_conc":0,"nps_conc":100.0,"prom_marca":6,"neut_marca":0,"det_marca":0,"nps_marca":100.0,"ftfr_si":6,"ftfr_pct":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null,"estado":"Logrado"},
+    {"nombre":"Rancagua","encuestas":14,"prom_conc":12,"neut_conc":0,"det_conc":2,"nps_conc":71.4,"prom_marca":9,"neut_marca":3,"det_marca":2,"nps_marca":50.0,"ftfr_si":13,"ftfr_pct":92.9,"brecha_conc":"+2 prom.","brecha_marca":"+5 prom.","brecha_ftfr":"+6 FTFR","estado":"No logrado"}
+  ],
+  "asesores": [
+    {"rank":1,"nombre":"Alex Gutierrez","sucursal":"Chillán","ots":5,"nps_conc":100.0,"nps_marca":100.0,"ftfr":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null},
+    {"rank":2,"nombre":"Boris Poblete","sucursal":"Talca","ots":5,"nps_conc":100.0,"nps_marca":100.0,"ftfr":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null},
+    {"rank":3,"nombre":"Génesis Carrasco","sucursal":"Chillán Com.","ots":5,"nps_conc":100.0,"nps_marca":100.0,"ftfr":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null},
+    {"rank":4,"nombre":"Margarita Parada","sucursal":"Linderos","ots":3,"nps_conc":100.0,"nps_marca":100.0,"ftfr":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null},
+    {"rank":5,"nombre":"Erick Cifuentes","sucursal":"Curicó","ots":1,"nps_conc":100.0,"nps_marca":100.0,"ftfr":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null},
+    {"rank":6,"nombre":"Vanessa Pizarro","sucursal":"Rancagua","ots":1,"nps_conc":100.0,"nps_marca":100.0,"ftfr":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null},
+    {"rank":7,"nombre":"Cristóbal López","sucursal":"Chillán Com.","ots":1,"nps_conc":100.0,"nps_marca":100.0,"ftfr":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null},
+    {"rank":8,"nombre":"Eduardo Ortiz","sucursal":"Linderos","ots":13,"nps_conc":100.0,"nps_marca":92.3,"ftfr":100.0,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":null},
+    {"rank":9,"nombre":"Cristian Aliaga","sucursal":"Curicó","ots":15,"nps_conc":93.3,"nps_marca":86.7,"ftfr":93.3,"brecha_conc":null,"brecha_marca":null,"brecha_ftfr":"+5 FTFR"},
+    {"rank":10,"nombre":"Juan Ortega","sucursal":"Talca","ots":11,"nps_conc":81.8,"nps_marca":81.8,"ftfr":100.0,"brecha_conc":"+1 prom.","brecha_marca":"+1 prom.","brecha_ftfr":null},
+    {"rank":11,"nombre":"Alexander Riquelme","sucursal":"Rancagua","ots":14,"nps_conc":69.2,"nps_marca":46.2,"ftfr":92.3,"brecha_conc":"+2 prom.","brecha_marca":"+5 prom.","brecha_ftfr":"+7 FTFR"}
+  ]
+}
