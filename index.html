@@ -3,42 +3,333 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard KPI Post Venta Ford 2026 — Grupo Curifor</title>
+<title>Post Venta Ford 2026 — Curifor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root {
-    --azul:    #003478;
-    --celeste: #1A8FD1;
-    --gris:    #F4F6F9;
-    --border:  #DDE2EA;
-    --text:    #1C2A3A;
-    --verde:   #1A9E5C;
-    --amarillo:#D4A017;
-    --rojo:    #C0392B;
-    --blanco:  #FFFFFF;
-    --shadow:  0 2px 8px rgba(0,52,120,.10);
+    /* Ford brand palette — preserved */
+    --ford:     #003478;
+    --azul:     #003478;
+    --celeste:  #1A8FD1;
+    --verde:    #1A9E5C;
+    --amarillo: #D4A017;
+    --rojo:     #C0392B;
+    --verde-bg:    rgba(26,158,92,.10);
+    --amarillo-bg: rgba(212,160,23,.10);
+    --rojo-bg:     rgba(192,57,43,.10);
+    /* Layout tokens */
+    --paper:   #f8f8f6;
+    --card:    #ffffff;
+    --line:    #dde3ed;
+    --line-2:  #c8d0df;
+    --text:    #0d1a2b;
+    --text-2:  #546070;
+    --text-3:  #8a96a4;
+    --gris:    #f8f8f6;
+    --border:  #dde3ed;
+    --blanco:  #ffffff;
+    --shadow:  none;
   }
+
+  /* ─── BASE ─────────────────────────────────────────────── */
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gris); color: var(--text); min-height: 100vh; }
+  html, body { font-family: 'Barlow', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: var(--paper); color: var(--text); min-height: 100vh; font-size: 14px; font-weight: 400; line-height: 1.5; }
 
-  /* LOGIN */
-#login-overlay{position:fixed;inset:0;background:#e8eef5;z-index:9999;display:flex;align-items:center;justify-content:center}
-.login-box{background:#fff;border-radius:14px;padding:48px 40px 40px;box-shadow:0 4px 32px rgba(0,52,120,.15);width:100%;max-width:400px;text-align:center}
-.login-logo{font-size:26px;font-weight:900;color:var(--ford);letter-spacing:2px;margin-bottom:4px}
-.login-sub{font-size:13px;color:#666;margin-bottom:8px}
-.login-divider{border:none;border-top:1px solid #e2e8f0;margin:20px 0}
-.login-box h2{font-size:17px;color:var(--ford);font-weight:700;margin-bottom:20px}
-.login-field{display:flex;flex-direction:column;gap:5px;text-align:left;margin-bottom:14px}
-.login-field label{font-size:12px;color:#666;font-weight:600}
-.login-field input{border:1px solid #e2e8f0;border-radius:7px;padding:10px 12px;font-size:14px;color:#1e293b;transition:border .15s;outline:none}
-.login-field input:focus{border-color:var(--celeste)}
-.login-btn{width:100%;background:var(--ford);color:#fff;border:none;border-radius:7px;padding:11px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;transition:background .15s}
-.login-btn:hover{background:var(--celeste)}
-.login-error{color:#C0392B;font-size:13px;margin-top:10px;min-height:18px}
-.login-footer{font-size:11px;color:#aaa;margin-top:18px}
+  /* ─── TOPBAR ────────────────────────────────────────────── */
+  .topbar { background: var(--ford); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 68px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .topbar-left { display: flex; align-items: center; gap: 20px; }
+  .brand-logo { height: 38px; width: auto; display: block; }
+  .topbar-divider { width: 1px; height: 28px; background: rgba(255,255,255,.15); }
+  .topbar-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  select.ctrl { background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.18); border-radius: 1px; padding: 7px 12px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif; font-weight: 500; letter-spacing: .02em; transition: all .15s; }
+  select.ctrl:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.35); }
+  select.ctrl option { background: var(--ford); color: #fff; }
 
-/* TOPBAR */
+  /* ─── CONTEXT STRIP ─────────────────────────────────────── */
+  .context-strip { background: var(--card); border-bottom: 1px solid var(--line); padding: 9px 32px; display: flex; align-items: center; gap: 20px; font-family: 'Barlow Condensed', sans-serif; font-size: 11.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--text-2); }
+  .ctx-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--verde); display: inline-block; margin-right: 6px; }
+  .ctx-sep { width: 1px; height: 12px; background: var(--line-2); }
+  .ctx-val { color: var(--text); font-weight: 700; }
+
+  /* ─── TABS ──────────────────────────────────────────────── */
+  .tabs { background: #001f4e; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; overflow-x: auto; padding: 0 32px; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { height: 0; }
+  .tab { padding: 16px 20px; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; cursor: pointer; color: rgba(255,255,255,.5); border-bottom: 2px solid transparent; white-space: nowrap; transition: all .2s; display: flex; align-items: center; gap: 9px; }
+  .tab:hover { color: #fff; }
+  .tab.active { color: #fff; border-bottom-color: var(--celeste); }
+  .tab-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; opacity: .5; font-weight: 500; letter-spacing: 0; }
+
+  /* ─── HERO STRIP ────────────────────────────────────────── */
+  .hero-strip { background: var(--ford); color: #fff; padding: 52px 32px 60px; position: relative; overflow: hidden; border-bottom: 4px solid var(--celeste); }
+  .hero-strip::before { content: ''; position: absolute; inset: 0; background: radial-gradient(900px 500px at 110% 50%, rgba(26,143,209,.22), transparent 60%); pointer-events: none; }
+  .hero-inner { max-width: 1440px; margin: 0 auto; position: relative; z-index: 1; display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: end; }
+  .hero-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--celeste); font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .hero-eyebrow::before { content: ''; width: 28px; height: 2px; background: var(--celeste); }
+  .hero-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(40px, 5vw, 72px); font-weight: 800; line-height: .95; letter-spacing: -.01em; text-transform: uppercase; color: #fff; margin-bottom: 16px; }
+  .hero-lede { font-size: 15px; color: rgba(255,255,255,.65); max-width: 520px; line-height: 1.55; font-weight: 300; }
+  .hero-stat { text-align: right; padding-left: 48px; border-left: 1px solid rgba(255,255,255,.15); }
+  .hero-stat-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: rgba(255,255,255,.5); font-weight: 700; margin-bottom: 12px; }
+  .hero-stat-value { font-family: 'Barlow Condensed', sans-serif; font-size: 76px; font-weight: 800; line-height: 1; letter-spacing: -.02em; color: #fff; margin-bottom: 6px; }
+  .hero-stat-meta { font-size: 11px; color: rgba(255,255,255,.5); letter-spacing: .08em; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; }
+
+  /* ─── MAIN ──────────────────────────────────────────────── */
+  main { max-width: 1440px; margin: 0 auto; padding: 44px 32px 96px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Eyebrow + section headers */
+  .sec-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 10.5px; letter-spacing: .24em; text-transform: uppercase; color: var(--text-2); font-weight: 700; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .sec-eyebrow::before { content: ''; width: 20px; height: 2px; background: var(--celeste); }
+  .sec-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(26px, 3vw, 36px); font-weight: 800; text-transform: uppercase; letter-spacing: -.01em; line-height: 1; color: var(--ford); margin-bottom: 6px; }
+  .sec-lede { font-size: 13.5px; color: var(--text-2); max-width: 660px; line-height: 1.55; margin-bottom: 32px; font-weight: 400; }
+
+  /* ─── CARDS ─────────────────────────────────────────────── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-bottom: 40px; }
+  .card { background: var(--card); padding: 22px 20px 20px; position: relative; }
+  .card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--celeste); opacity: 0; transition: opacity .2s; }
+  .card:hover::after { opacity: 1; }
+  .card-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .18em; color: var(--text-2); margin-bottom: 12px; }
+  .card-value { font-family: 'Barlow Condensed', sans-serif; font-size: 38px; font-weight: 800; color: var(--ford); line-height: 1; letter-spacing: -.02em; }
+  .card-sub { font-size: 11.5px; color: var(--text-3); margin-top: 8px; }
+  .card.verde .card-value { color: var(--verde); }
+  .card.amarillo .card-value { color: var(--amarillo); }
+  .card.rojo .card-value { color: var(--rojo); }
+
+  /* ─── PANEL ─────────────────────────────────────────────── */
+  .panel { background: var(--card); border: 1px solid var(--line); padding: 26px 28px; margin-bottom: 20px; }
+  .panel h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ford); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+  .panel h2::before { content: ''; width: 3px; height: 18px; background: var(--celeste); border-radius: 0; }
+  .panel h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--text-2); margin: 20px 0 12px; border-top: 1px solid var(--line); padding-top: 16px; }
+
+  /* ─── FORM ──────────────────────────────────────────────── */
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px 18px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-family: 'Barlow Condensed', sans-serif; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--text-2); }
+  .form-group input, .form-group select { background: var(--paper); border: 1px solid var(--line-2); border-radius: 0; padding: 9px 11px; font-size: 14px; color: var(--text); transition: all .15s; font-family: 'Barlow', sans-serif; outline: none; }
+  .form-group input:hover, .form-group select:hover { border-color: var(--text-3); }
+  .form-group input:focus, .form-group select:focus { border-color: var(--ford); background: #fff; box-shadow: 0 0 0 3px rgba(0,52,120,.08); }
+  .form-group input[readonly] { background: var(--paper); color: var(--ford); font-weight: 700; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; letter-spacing: .02em; }
+  .form-group input::placeholder { color: var(--text-3); font-weight: 400; }
+
+  /* ─── REBATE BOX ────────────────────────────────────────── */
+  .rebate-box { margin-top: 20px; border: 1px solid var(--line); padding: 18px 22px; display: flex; align-items: center; gap: 20px; border-left: 4px solid var(--line-2); }
+  .rebate-box.verde { border-left-color: var(--verde); background: var(--verde-bg); }
+  .rebate-box.amarillo { border-left-color: var(--amarillo); background: var(--amarillo-bg); }
+  .rebate-box.rojo { border-left-color: var(--rojo); background: var(--rojo-bg); }
+  .rebate-icon { font-size: 28px; }
+  .rebate-pct { font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 900; line-height: 1; letter-spacing: -.02em; }
+  .rebate-box.verde .rebate-pct { color: var(--verde); }
+  .rebate-box.amarillo .rebate-pct { color: var(--amarillo); }
+  .rebate-box.rojo .rebate-pct { color: var(--rojo); }
+  .rebate-detail { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+  .rebate-detail b { color: var(--text); font-weight: 600; }
+
+  /* ─── SEMÁFORO ──────────────────────────────────────────── */
+  .semaforo { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; border: 1px solid transparent; }
+  .s-verde    { background: var(--verde-bg); color: var(--verde); border-color: rgba(26,158,92,.25); }
+  .s-amarillo { background: var(--amarillo-bg); color: #9A7010; border-color: rgba(212,160,23,.25); }
+  .s-rojo     { background: var(--rojo-bg); color: var(--rojo); border-color: rgba(192,57,43,.25); }
+  .s-gris     { background: var(--paper); color: var(--text-2); border-color: var(--line); }
+
+  /* ─── TABLE ─────────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--ford); color: #fff; padding: 11px 13px; text-align: left; font-family: 'Barlow Condensed', sans-serif; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; border-right: 1px solid rgba(255,255,255,.1); }
+  th:last-child { border-right: none; }
+  td { padding: 10px 13px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 13px; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(0,52,120,.03); }
+
+  /* ─── BOTONES ───────────────────────────────────────────── */
+  .btn { padding: 9px 18px; border-radius: 0; border: 1px solid transparent; cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; transition: all .15s; display: inline-flex; align-items: center; gap: 7px; }
+  .btn-primary { background: var(--ford); color: #fff; border-color: var(--ford); }
+  .btn-primary:hover { background: #001f4e; }
+  .btn-success { background: var(--verde); color: #fff; border-color: var(--verde); }
+  .btn-success:hover { background: #157a47; }
+  .btn-danger { background: var(--rojo); color: #fff; border-color: var(--rojo); }
+  .btn-danger:hover { background: #9b2b20; }
+  .btn-outline { background: transparent; color: var(--ford); border-color: var(--ford); }
+  .btn-outline:hover { background: rgba(0,52,120,.07); }
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+
+  /* ─── FORMULA BOX ───────────────────────────────────────── */
+  .formula-box { background: rgba(0,52,120,.05); border-left: 3px solid var(--celeste); padding: 12px 16px; margin: 14px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--ford); }
+
+  /* ─── BADGE ─────────────────────────────────────────────── */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .badge-blue { background: rgba(0,52,120,.1); color: var(--ford); border: 1px solid rgba(0,52,120,.2); }
+
+  /* ─── NPS CHECK ─────────────────────────────────────────── */
+  .nps-check { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid var(--line); margin-top: 10px; font-size: 13px; }
+  .nps-check input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--ford); cursor: pointer; }
+
+  /* ─── DESCUENTOS ────────────────────────────────────────── */
+  .desc-add { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+
+  /* ─── MODAL ─────────────────────────────────────────────── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--card); border: 1px solid var(--line); padding: 32px; width: 520px; max-width: 96vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 32px 64px -16px rgba(0,0,0,.3); }
+  .modal h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--ford); margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+
+  /* ─── TABLA REBATES ─────────────────────────────────────── */
+  .rebate-tabla { width: 100%; border-collapse: collapse; font-size: 13px; margin: 14px 0; }
+  .rebate-tabla th { background: var(--ford); color: #fff; padding: 9px 12px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; }
+  .rebate-tabla td { padding: 8px 12px; text-align: center; border-bottom: 1px solid var(--line); }
+  .rebate-tabla tr.highlight td { background: var(--verde-bg); font-weight: 700; color: var(--verde); }
+
+  /* ─── CHART ─────────────────────────────────────────────── */
+  .chart-wrap { position: relative; height: 320px; }
+
+  /* ─── SUC GRID ──────────────────────────────────────────── */
+  .suc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .suc-card { background: var(--card); border: 1px solid var(--line); padding: 18px; border-top: 3px solid var(--ford); }
+  .suc-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--ford); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .suc-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 3px 0; }
+  .suc-row span:first-child { color: var(--text-2); }
+
+  /* ─── FORD+ ─────────────────────────────────────────────── */
+  .fp-score-box { display: flex; align-items: center; gap: 24px; background: var(--ford); border-bottom: 4px solid var(--celeste); padding: 24px 28px; margin-bottom: 20px; flex-wrap: wrap; color: #fff; }
+  .fp-score-main { text-align: center; }
+  .fp-score-num { font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 900; color: #fff; line-height: 1; }
+  .fp-score-max { font-size: 13px; color: rgba(255,255,255,.5); font-family: 'Barlow Condensed', sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+  .fp-cat-badge { padding: 8px 22px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; border-radius: 0; }
+  .fp-cat-gold   { background: #FFF3CD; color: #856404; border: 2px solid #D4A017; }
+  .fp-cat-silver { background: #E9ECEF; color: #495057; border: 2px solid #8A95A3; }
+  .fp-cat-bronze { background: #FDE8D8; color: #8B4513; border: 2px solid #CD7F32; }
+  .fp-cat-none   { background: rgba(255,255,255,.1); color: rgba(255,255,255,.6); border: 2px solid rgba(255,255,255,.2); }
+  .fp-prog-wrap  { flex: 1; min-width: 220px; }
+  .fp-prog-label { display: flex; justify-content: space-between; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.65); margin-bottom: 6px; font-weight: 600; }
+  .fp-prog-track { background: rgba(255,255,255,.15); border-radius: 0; height: 10px; position: relative; overflow: visible; }
+  .fp-prog-fill  { height: 100%; border-radius: 0; transition: width .4s; background: var(--celeste); }
+  .fp-prog-mark  { position: absolute; top: -4px; width: 2px; height: 18px; }
+  .fp-prog-mark.gold   { background: #D4A017; }
+  .fp-prog-mark.silver { background: #8A95A3; }
+  .fp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .fp-card { background: var(--card); border: 1px solid var(--line); padding: 16px 18px; border-top: 2px solid var(--celeste); position: relative; }
+  .fp-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .fp-card-name { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--ford); line-height: 1.3; }
+  .fp-card-max  { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: var(--text-3); font-weight: 600; white-space: nowrap; margin-left: 8px; text-transform: uppercase; letter-spacing: .08em; }
+  .fp-pts-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; margin-top: 4px; letter-spacing: -.01em; }
+  .fp-pts-badge.full { color: var(--verde); }
+  .fp-pts-badge.half { color: var(--amarillo); }
+  .fp-pts-badge.zero { color: var(--rojo); }
+  .fp-pts-badge.idle { color: var(--line-2); }
+  .fp-pts-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: .1em; font-weight: 600; }
+  .fp-input-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .fp-input-row label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: var(--text-2); font-weight: 700; white-space: nowrap; letter-spacing: .06em; text-transform: uppercase; }
+  .fp-input-row input[type=number] { border: 1px solid var(--line-2); border-radius: 0; padding: 6px 10px; font-size: 13px; width: 90px; font-family: 'Barlow', sans-serif; }
+  .fp-input-row input:focus { outline: none; border-color: var(--ford); box-shadow: 0 0 0 2px rgba(0,52,120,.1); }
+  .fp-select { border: 1px solid var(--line-2); border-radius: 0; padding: 6px 10px; font-size: 13px; color: var(--text); font-family: 'Barlow', sans-serif; }
+  .fp-select:focus { outline: none; border-color: var(--ford); }
+  .fp-hint { font-size: 11px; color: var(--text-3); margin-top: 6px; line-height: 1.5; }
+  .fp-pts-right { text-align: right; }
+  .fp-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .fp-table th { background: var(--ford); color: #fff; padding: 9px 12px; text-align: left; font-family: 'Barlow Condensed', sans-serif; font-size: 10.5px; text-transform: uppercase; letter-spacing: .12em; font-weight: 700; }
+  .fp-table td { padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  .fp-table tr:last-child td { border-bottom: none; }
+  .fp-table tr:hover td { background: rgba(0,52,120,.03); }
+  .fp-q-sel { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .fp-q-btn { padding: 7px 18px; border-radius: 0; border: 1px solid var(--line-2); background: var(--card); font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--text-2); transition: all .15s; letter-spacing: .08em; text-transform: uppercase; }
+  .fp-q-btn.active { background: var(--ford); color: #fff; border-color: var(--ford); }
+  .fp-q-btn:hover:not(.active) { border-color: var(--ford); color: var(--ford); }
+
+  /* ─── NPS ───────────────────────────────────────────────── */
+  .nps-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; }
+  .nps-badge { background: var(--ford); color: #fff; padding: 6px 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .nps-section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .18em; color: var(--text-2); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .nps-kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .nps-kpi { background: var(--card); border: 1px solid var(--line); padding: 16px 18px; position: relative; overflow: hidden; }
+  .nps-kpi::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .nps-kpi.nv::before { background: var(--verde); }
+  .nps-kpi.na::before { background: var(--amarillo); }
+  .nps-kpi.nr::before { background: var(--rojo); }
+  .nps-kpi.nb::before { background: var(--celeste); }
+  .nps-kpi-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: .14em; color: var(--text-2); font-weight: 700; margin-bottom: 8px; }
+  .nps-kpi-val { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; line-height: 1; letter-spacing: -.02em; }
+  .nps-kpi.nv .nps-kpi-val { color: var(--verde); }
+  .nps-kpi.na .nps-kpi-val { color: var(--amarillo); }
+  .nps-kpi.nr .nps-kpi-val { color: var(--rojo); }
+  .nps-kpi.nb .nps-kpi-val { color: var(--celeste); }
+  .nps-kpi-sub  { margin-top: 5px; font-size: 11px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; }
+  .nps-kpi-status { margin-top: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .nps-kpi.nv .nps-kpi-status { color: var(--verde); }
+  .nps-kpi.na .nps-kpi-status { color: var(--amarillo); }
+  .nps-kpi.nr .nps-kpi-status { color: var(--rojo); }
+  .nps-kpi.nb .nps-kpi-status { color: var(--celeste); }
+
+  .nps-tbl-wrap { background: var(--card); border: 1px solid var(--line); overflow: auto; margin-bottom: 22px; }
+  .nps-tbl { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 980px; }
+  .nps-tbl thead tr:first-child { background: var(--ford); }
+  .nps-tbl thead tr:first-child th { padding: 10px 11px; font-family: 'Barlow Condensed', sans-serif; font-size: 10.5px; text-transform: uppercase; letter-spacing: .12em; color: rgba(255,255,255,.8); font-weight: 700; text-align: center; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .nps-tbl thead tr:last-child { background: rgba(0,52,120,.06); }
+  .nps-tbl thead tr:last-child th { padding: 7px 9px; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-2); font-weight: 700; text-align: center; border-bottom: 2px solid var(--line); white-space: nowrap; }
+  .nps-tbl td { padding: 9px 10px; border-top: 1px solid var(--line); text-align: center; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+  .nps-tbl tr:hover td { background: rgba(0,52,120,.025); }
+  .nps-tbl td.col-suc { text-align: left; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 13px; padding-left: 16px; white-space: nowrap; }
+  .nps-tbl tr.grupo-row td { background: rgba(0,52,120,.06); border-top: 2px solid var(--ford); font-weight: 700; }
+  .nps-tbl tr.grupo-row td.col-suc { color: var(--ford); font-family: 'Barlow Condensed', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: .08em; }
+  .bg-nc  { background: rgba(0,52,120,.04) !important; }
+  .bg-nm  { background: rgba(26,158,92,.04) !important; }
+  .bg-ft  { background: rgba(212,160,23,.04) !important; }
+  .bg-gp  { background: rgba(107,122,141,.04) !important; }
+  .bdr-nc { border-left: 2px solid rgba(0,52,120,.2) !important; }
+  .bdr-nm { border-left: 2px solid rgba(26,158,92,.2) !important; }
+  .bdr-ft { border-left: 2px solid rgba(212,160,23,.2) !important; }
+  .bdr-gp { border-left: 2px solid rgba(107,122,141,.2) !important; }
+  .vg { color: var(--verde); font-weight: 600; }
+  .va { color: var(--amarillo); font-weight: 600; }
+  .vr { color: var(--rojo); font-weight: 600; }
+  .vm { color: var(--text-3); }
+  .gap-ok   { color: var(--verde); font-size: 11px; }
+  .gap-need { color: var(--amarillo); font-size: 11px; font-weight: 600; }
+  .nps-rank-num { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; width: 42px; }
+  .nps-asesor { text-align: left !important; font-family: 'Barlow', sans-serif !important; font-weight: 600; font-size: 13px !important; }
+  .nps-suctag { font-size: 11px; color: var(--text-3); font-family: 'Barlow', sans-serif !important; }
+
+  /* ─── TOAST ─────────────────────────────────────────────── */
+  #toast { position: fixed; bottom: 28px; right: 28px; background: var(--ford); color: #fff; padding: 13px 22px; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; z-index: 9999; opacity: 0; transition: opacity .3s; pointer-events: none; border-left: 3px solid var(--celeste); }
+  #toast.show { opacity: 1; }
+
+  /* ─── FOOTER ────────────────────────────────────────────── */
+  .footer { text-align: center; color: var(--text-3); font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 32px 0 20px; }
+
+  /* ─── INFO BOX ──────────────────────────────────────────── */
+  .info-box { background: rgba(0,52,120,.05); border-left: 3px solid var(--celeste); padding: 12px 16px; font-size: 12.5px; color: var(--ford); line-height: 1.6; margin: 12px 0; }
+  .info-box strong { color: var(--ford); font-weight: 700; }
+
+  /* ─── PROGRESS ──────────────────────────────────────────── */
+  .progress-wrap { background: var(--line); border-radius: 0; height: 8px; margin: 6px 0; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 0; transition: width .4s; }
+  .progress-fill.verde    { background: var(--verde); }
+  .progress-fill.amarillo { background: var(--amarillo); }
+  .progress-fill.rojo     { background: var(--rojo); }
+
+  /* ─── RESPONSIVE ────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 28px; }
+    .hero-stat { padding-left: 0; border-left: none; border-top: 1px solid rgba(255,255,255,.15); padding-top: 20px; text-align: left; }
+  }
+  @media (max-width: 640px) {
+    .topbar { flex-wrap: wrap; height: auto; padding: 14px 20px; gap: 12px; }
+    .topbar-right { flex-wrap: wrap; width: 100%; }
+    .tabs { padding: 0 20px; }
+    main { padding: 28px 20px 64px; }
+    .hero-strip { padding: 36px 20px 44px; }
+    .cards { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .panel { padding: 20px 18px; }
+    .context-strip { padding: 9px 20px; flex-wrap: wrap; gap: 10px; }
+  }
+</style>
+
+  /* TOPBAR */
   .topbar { background: var(--azul); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 58px; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
   .topbar-left { display: flex; align-items: center; gap: 14px; }
   .ford-logo { width: 44px; height: 44px; background: var(--celeste); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; letter-spacing: -1px; color: #fff; border: 2px solid rgba(255,255,255,.35); }
@@ -285,37 +576,21 @@
 </style>
 </head>
 <body>
-<!-- LOGIN OVERLAY -->
-<div id="login-overlay">
-  <div class="login-box">
-    <div class="login-logo">&#9646; FORD</div>
-    <div class="login-sub">Grupo Curifor &mdash; Post Venta</div>
-    <hr class="login-divider"/>
-    <h2>Dashboard KPI Ford 2026</h2>
-    <div class="login-field">
-      <label>Correo institucional</label>
-      <input type="email" id="login-email" placeholder="tucorreo@curifor.com" autocomplete="email"/>
-    </div>
-    <div class="login-field">
-      <label>Contrase&ntilde;a</label>
-      <input type="password" id="login-pwd" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password"/>
-    </div>
-    <button class="login-btn" onclick="loginCheck()">Ingresar</button>
-    <div class="login-error" id="login-error"></div>
-    <div class="login-footer">Acceso restringido al personal de Curifor S.A.</div>
-  </div>
-</div>
-
 
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="topbar-left">
-    <div class="ford-logo">F</div>
-    <div>
-      <h1>Dashboard Post Venta Ford 2026</h1>
-    </div>
+    <img src="data:image/png;base64,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" alt="Curifor" class="brand-logo"/>
+    <div class="topbar-divider"></div>
+    <div class="topbar-sub">Plataforma Post Venta · Ford 2026</div>
   </div>
   <div class="topbar-right">
+    <select class="ctrl" id="selSucursal" onchange="cambiarSucursal()">
+      <option>Curifor Chillan</option>
+      <option>Curifor Curico</option>
+      <option>Curifor Linderos</option>
+      <option>Curifor Rancagua</option>
+    </select>
     <select class="ctrl" id="selMes" onchange="cambiarMes()">
       <option value="2026-01">Enero 2026</option>
       <option value="2026-02">Febrero 2026</option>
@@ -333,22 +608,49 @@
   </div>
 </div>
 
+<!-- CONTEXT STRIP -->
+<div class="context-strip">
+  <span><span class="ctx-dot"></span>En línea</span>
+  <div class="ctx-sep"></div>
+  <span>Sucursal · <span class="ctx-val" id="ctx-sucursal">—</span></span>
+  <div class="ctx-sep"></div>
+  <span>Periodo · <span class="ctx-val" id="ctx-periodo">—</span></span>
+  <div class="ctx-sep"></div>
+  <span style="margin-left:auto">Programa Incentivos Post Venta · Política Comercial Ford 2026</span>
+</div>
+
 <!-- TABS -->
 <div class="tabs">
-  <div class="tab active" onclick="showTab('dashboard')">📊 Dashboard</div>
-  <div class="tab" onclick="showTab('compra')">🛒 Incentivo Compra</div>
-  <div class="tab" onclick="showTab('descuentos')">🏷️ Descuentos Especiales</div>
-  <div class="tab" onclick="showTab('historico')">📈 Histórico</div>
-  <div class="tab" onclick="showTab('fordplus')">🏆 Ford+</div>
-  <div class="tab" onclick="showTab('srp')">🔧 SRP 4.0</div>
-  <div class="tab" onclick="showTab('nps')">⭐ NPS & FTFR</div>
-  <div class="tab" onclick="showTab('referencia')">📋 Referencia Política</div>
+  <div class="tab active" onclick="showTab('dashboard')"><span class="tab-num">01</span>Dashboard</div>
+  <div class="tab" onclick="showTab('compra')"><span class="tab-num">02</span>Incentivo Compra</div>
+  <div class="tab" onclick="showTab('descuentos')"><span class="tab-num">03</span>Descuentos</div>
+  <div class="tab" onclick="showTab('historico')"><span class="tab-num">04</span>Histórico</div>
+  <div class="tab" onclick="showTab('fordplus')"><span class="tab-num">05</span>Ford+</div>
+  <div class="tab" onclick="showTab('srp')"><span class="tab-num">06</span>SRP 4.0</div>
+  <div class="tab" onclick="showTab('nps')"><span class="tab-num">07</span>NPS &amp; FTFR</div>
+  <div class="tab" onclick="showTab('referencia')"><span class="tab-num">08</span>Referencia</div>
 </div>
 
 <main>
 
 <!-- ===================== DASHBOARD ===================== -->
 <div class="section active" id="sec-dashboard">
+
+  <!-- Hero strip — full bleed via negative margin -->
+  <div class="hero-strip" style="margin:-44px -32px 44px">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-eyebrow">Post Venta · <span id="hero-periodo">—</span> · <span id="hero-suc">—</span></div>
+        <h1 class="hero-title">Indicadores<br>Post Venta<br>Ford.</h1>
+        <p class="hero-lede">Seguimiento mensual del incentivo de compra de repuestos, Ford+ Gestión 2026, NPS & FTFR y descuentos especiales para la red Curifor.</p>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-label">Cumplimiento · Grupo Curifor</div>
+        <div class="hero-stat-value" id="hero-pct">—</div>
+        <div class="hero-stat-meta" id="hero-rebate">Rebate ponderado · —</div>
+      </div>
+    </div>
+  </div>
 
   <div class="cards" id="cards-resumen">
     <div class="card" id="card-cumplimiento">
@@ -374,13 +676,13 @@
   </div>
 
   <div class="panel">
-    <h2>🏢 Grupo Curifor — <span id="dash-mes-label">Mes actual</span></h2>
+    <h2>Grupo Curifor · <span id="dash-mes-label">Mes actual</span></h2>
     <div class="suc-grid" id="suc-grid-resumen"></div>
   </div>
 
   <div class="info-box">
     <strong>Circular FCSD CC 06 – 2026 · Vigente desde 01/01/2026.</strong><br>
-    Política reemplaza circular FCSD 02 – 2025. Consultas: Gerente de Zona · rleonpor@ford.com · fpostven@ford.com
+    Política reemplaza circular FCSD 02 – 2025. Consultas: Gerente de Zona · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b0c2dcd5dfdec0dfc2f0d6dfc2d49ed3dfdd">[email&#160;protected]</a> · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c7a1b7a8b4b3b1a2a987a1a8b5a3e9a4a8aa">[email&#160;protected]</a>
   </div>
 </div>
 
@@ -388,7 +690,7 @@
 <div class="section" id="sec-compra">
 
   <div class="panel">
-    <h2>🛒 Incentivo Mensual por Cumplimiento de Compra — Red Curifor</h2>
+    <h2>Incentivo Mensual · Cumplimiento de Compra</h2>
 
     <div class="info-box">
       Rebate calculado sobre <strong>BLM = Total Comprado – Garantías (GNM) – Notas de Crédito (NCM)</strong>.
@@ -396,38 +698,69 @@
     </div>
 
     <h3>📥 Ingreso de Datos del Mes</h3>
-    <div style="overflow-x:auto;">
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <thead>
-          <tr style="background:var(--ford);color:#fff;">
-            <th style="padding:10px 12px;text-align:left;font-weight:700;">Sucursal</th>
-            <th style="padding:10px 8px;text-align:center;">Meta ($)</th>
-            <th style="padding:10px 8px;text-align:center;">Comprado ($)</th>
-            <th style="padding:10px 8px;text-align:center;">GNM ($)</th>
-            <th style="padding:10px 8px;text-align:center;">NCM ($)</th>
-            <th style="padding:10px 8px;text-align:center;">BLM ($)</th>
-            <th style="padding:10px 8px;text-align:center;">% Cump.</th>
-            <th style="padding:10px 8px;text-align:center;">NPS (%)</th>
-            <th style="padding:10px 8px;text-align:center;">Tasa (%)</th>
-            <th style="padding:10px 8px;text-align:center;">NPS OK</th>
-            <th style="padding:10px 8px;text-align:center;">Rebate</th>
-          </tr>
-        </thead>
-        <tbody id="compra-tbody"></tbody>
-        <tfoot id="compra-tfoot"></tfoot>
-      </table>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Meta de Compra Mensual ($)</label>
+        <input type="number" id="in-meta" placeholder="0" oninput="calcularCompra()">
+      </div>
+      <div class="form-group">
+        <label>Total Comprado ($)</label>
+        <input type="number" id="in-comprado" placeholder="0" oninput="calcularCompra()">
+      </div>
+      <div class="form-group">
+        <label>Garantías Notificadas — GNM ($)</label>
+        <input type="number" id="in-gnm" placeholder="0" oninput="calcularCompra()">
+      </div>
+      <div class="form-group">
+        <label>Notas de Crédito — NCM ($)</label>
+        <input type="number" id="in-ncm" placeholder="0" oninput="calcularCompra()">
+      </div>
+      <div class="form-group">
+        <label>BLM calculado ($)</label>
+        <input type="text" id="in-blm" readonly placeholder="Automático">
+      </div>
+      <div class="form-group">
+        <label>% Cumplimiento</label>
+        <input type="text" id="in-pct" readonly placeholder="Automático">
+      </div>
     </div>
 
-    <div class="formula-box" style="margin-top:14px;">BLM = Total Comprado – GNM – NCM &nbsp;·&nbsp; Rebate: ≥110%→5% · 100–109%→4% · &lt;100%→0% · Bonus NPS +1%</div>
+    <div class="formula-box">BLM = Total Comprado – GNM – NCM</div>
 
-    <div class="btn-row" style="margin-top:16px;">
-      <button class="btn btn-primary" onclick="guardarCompra()">💾 Guardar todos</button>
+    <h3>⭐ Bonus NPS (condición adicional +1%)</h3>
+    <div class="nps-check">
+      <input type="checkbox" id="chk-nps" onchange="calcularCompra()">
+      <label for="chk-nps" style="cursor:pointer; font-size:13px;">
+        NPS ≥ <strong>83%</strong> y tasa de respuesta ≥ <strong>18%</strong> (confirmado por Gerente de Zona)
+      </label>
+    </div>
+    <div class="form-grid" style="margin-top:12px;">
+      <div class="form-group">
+        <label>NPS del mes (%)</label>
+        <input type="number" id="in-nps" placeholder="0.0" step="0.1" oninput="calcularCompra()">
+      </div>
+      <div class="form-group">
+        <label>Tasa de Respuesta (%)</label>
+        <input type="number" id="in-tasa" placeholder="0.0" step="0.1" oninput="calcularCompra()">
+      </div>
+    </div>
+
+    <div class="rebate-box" id="rebate-result">
+      <div class="rebate-icon">📦</div>
+      <div>
+        <div class="rebate-pct" id="rebate-pct-val">—</div>
+        <div class="rebate-detail" id="rebate-detail-txt">Ingresa los datos para calcular el rebate</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="guardarCompra()">💾 Guardar datos del mes</button>
       <button class="btn btn-outline" onclick="limpiarCompra()">🗑️ Limpiar</button>
     </div>
   </div>
 
   <div class="panel">
-    <h2>📊 Tabla de Rebates — Referencia</h2>
+    <h2>Tabla de Rebates · Referencia</h2>
     <table class="rebate-tabla" id="tabla-rebates-ref">
       <thead>
         <tr><th>Cumplimiento Mensual</th><th>% Rebate Base</th><th>Con Bonus NPS (+1%)</th></tr>
@@ -439,7 +772,7 @@
       </tbody>
     </table>
     <div class="info-box" style="margin-top:12px;">
-      <strong>Proceso de pago:</strong> El coordinador de Revenue Management calcula el cumplimiento → Gerente de Zona notifica monto aprobado → concesionario emite factura a <em>rleonpor@ford.com y fpostven@ford.com</em> dentro de <strong>60 días</strong> (o hasta el 15/feb del año siguiente). Adjuntar copia de factura + correo de notificación de incentivos.
+      <strong>Proceso de pago:</strong> El coordinador de Revenue Management calcula el cumplimiento → Gerente de Zona notifica monto aprobado → concesionario emite factura a <em><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2d5f414842435d425f6d4b425f49034e4240">[email&#160;protected]</a> y <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c9afb9a6babdbfaca789afa6bbade7aaa6a4">[email&#160;protected]</a></em> dentro de <strong>60 días</strong> (o hasta el 15/feb del año siguiente). Adjuntar copia de factura + correo de notificación de incentivos.
     </div>
   </div>
 </div>
@@ -447,16 +780,7 @@
 <!-- ===================== DESCUENTOS ESPECIALES ===================== -->
 <div class="section" id="sec-descuentos">
   <div class="panel">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;background:#f0f4f8;border-radius:8px;padding:10px 14px;">
-      <span style="font-size:13px;font-weight:700;color:#4A5568;">Sucursal:</span>
-      <select style="border:1px solid #CBD5E0;border-radius:6px;padding:5px 10px;font-size:13px;color:#2D3748;background:#fff;cursor:pointer;" onchange="_sucActual=this.value; cargarPagina();">
-        <option>Curifor Chillan</option>
-        <option>Curifor Curico</option>
-        <option>Curifor Linderos</option>
-        <option>Curifor Rancagua</option>
-      </select>
-    </div>
-    <h2>🏷️ Descuentos Especiales a Clientes Finales</h2>
+    <h2>Descuentos Especiales · Clientes Finales</h2>
     <div class="info-box">
       Permite otorgar descuentos en repuestos a clientes finales (venta directa o reparaciones de alto monto).
       El concesionario debe aportar <strong>mínimo 10%</strong>. Presupuesto limitado y compartido por la red.
@@ -487,7 +811,7 @@
   </div>
 
   <div class="panel">
-    <h2>📋 Proceso para Descuentos Especiales</h2>
+    <h2>Proceso · Descuentos Especiales</h2>
     <div style="font-size:13px; line-height:1.8; color:#4A5568;">
       <p><strong>Requisitos para solicitar:</strong></p>
       <ol style="margin: 8px 0 14px 20px;">
@@ -498,7 +822,7 @@
       </ol>
       <p><strong>Una vez aprobado:</strong> emitir factura a Ford Chile por el valor del descuento autorizado en máximo <strong>60 días corridos</strong>.</p>
       <p style="margin-top:8px;"><strong>Documentos a enviar:</strong> aprobación del descuento · factura de compra Ford Chile · factura de venta cliente final · factura a Ford por monto del descuento.</p>
-      <p style="margin-top:8px;">📧 Enviar a: <strong>rleonpor@ford.com</strong> y <strong>fpostven@ford.com</strong></p>
+      <p style="margin-top:8px;">📧 Enviar a: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b6c4dad3d9d8c6d9c4f6d0d9c4d298d5d9db">[email&#160;protected]</a></strong> y <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dfb9afb0acaba9bab19fb9b0adbbf1bcb0b2">[email&#160;protected]</a></strong></p>
     </div>
   </div>
 </div>
@@ -506,7 +830,7 @@
 <!-- ===================== HISTÓRICO ===================== -->
 <div class="section" id="sec-historico">
   <div class="panel">
-    <h2>📈 Histórico Anual — Cumplimiento de Compra 2026</h2>
+    <h2>Histórico Anual · Cumplimiento de Compra 2026</h2>
     <div style="display:flex; gap:10px; margin-bottom:4px; flex-wrap:wrap; align-items:center;">
       <span style="font-size:12px; color:#8A95A3;">Grupo Curifor — 4 sucursales · % Cumplimiento mensual de compra</span>
     </div>
@@ -525,16 +849,7 @@
 <div class="section" id="sec-fordplus">
 
   <div class="panel">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;background:#f0f4f8;border-radius:8px;padding:10px 14px;">
-      <span style="font-size:13px;font-weight:700;color:#4A5568;">Sucursal:</span>
-      <select style="border:1px solid #CBD5E0;border-radius:6px;padding:5px 10px;font-size:13px;color:#2D3748;background:#fff;cursor:pointer;" onchange="_sucActual=this.value; cargarPagina();">
-        <option>Curifor Chillan</option>
-        <option>Curifor Curico</option>
-        <option>Curifor Linderos</option>
-        <option>Curifor Rancagua</option>
-      </select>
-    </div>
-    <h2>🏆 Gestión Ford+ — Indicadores Postventa 2026</h2>
+    <h2>Ford+ Gestión · Indicadores Postventa 2026</h2>
 
     <!-- Selector trimestre -->
     <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
@@ -812,7 +1127,7 @@
 
   <!-- Tabla resumen de puntajes -->
   <div class="panel">
-    <h2>📋 Resumen de Puntajes — <span id="fp-suc-label"></span></h2>
+    <h2>Resumen de Puntajes · <span id="fp-suc-label"></span></h2>
     <table class="fp-table">
       <thead>
         <tr>
@@ -1012,7 +1327,7 @@
 
   <!-- REQUISITOS OBLIGATORIOS -->
   <div class="panel" style="margin-top:20px;">
-    <h2>⚠️ Requisitos Obligatorios — Monitoreados</h2>
+    <h2>Requisitos Obligatorios · Monitoreados</h2>
     <div class="info-box" style="margin-bottom:16px;">
       Estos requisitos <strong>no suman puntaje</strong> en SRP 4.0, pero su incumplimiento puede <strong>invalidar la participación</strong>. El Ingeniero de Servicio los verifica en cada visita al concesionario.
     </div>
@@ -1060,7 +1375,7 @@
 
   <!-- TABLA CAMPAÑAS FSA -->
   <div class="panel">
-    <h2>📋 Campañas FSA Activas — Referencia (Edición Abril 2026)</h2>
+    <h2>Campañas FSA Activas · Referencia Abril 2026</h2>
     <div class="info-box" style="margin-bottom:12px;">
       Todo vehículo con campaña abierta que ingrese al taller debe recibir la reparación. Medición: Agenda Ford vs OWS, considerando <strong>30 días</strong> post-cierre de fecha agendada.
     </div>
@@ -1185,7 +1500,7 @@
 <!-- ===================== REFERENCIA ===================== -->
 <div class="section" id="sec-referencia">
   <div class="panel">
-    <h2>📋 Resumen Política Comercial Ford Posventa 2026</h2>
+    <h2>Política Comercial Ford · Posventa 2026</h2>
     <div class="info-box"><strong>Circular FCSD CC 06 – 2026 · Ford Chile · 19/01/2026</strong><br>Reemplaza circular FCSD 02 – 2025. Vigente desde el 1 de enero de 2026.</div>
 
     <h3>1. Incentivo Mensual por Cumplimiento de Compra</h3>
@@ -1202,7 +1517,7 @@
       <p><strong>Bonus NPS:</strong> +1% adicional si NPS ≥ 83% y tasa de respuesta ≥ 18%.</p>
       <p style="margin-top:8px;"><strong>Fórmula BLM:</strong> BLM = Total Comprado – GNM (Garantías Notificadas al mes) – NCM (Nota de Crédito del mes)</p>
       <p style="margin-top:8px;"><strong>Plazo facturación:</strong> 60 días desde notificación (o hasta 15/feb del año siguiente si implica cambio de año).</p>
-      <p style="margin-top:8px;"><strong>Proceso:</strong> Revenue Management calcula → Gerente de Zona notifica por correo (2ª semana del mes siguiente) → concesionario emite factura → enviar a rleonpor@ford.com y fpostven@ford.com.</p>
+      <p style="margin-top:8px;"><strong>Proceso:</strong> Revenue Management calcula → Gerente de Zona notifica por correo (2ª semana del mes siguiente) → concesionario emite factura → enviar a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6c1e000903021c031e2c0a031e08420f0301">[email&#160;protected]</a> y <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a4c2d4cbd7d0d2c1cae4c2cbd6c08ac7cbc9">[email&#160;protected]</a>.</p>
     </div>
 
     <h3>2. Beneficio de Descuentos Especiales</h3>
@@ -1220,7 +1535,7 @@
 
     <h3>Contactos Ford Chile</h3>
     <div style="font-size:13px; color:#4A5568; margin-top:8px;">
-      📧 rleonpor@ford.com · fpostven@ford.com<br>
+      📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="66140a03090816091426000914024805090b">[email&#160;protected]</a> · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f197819e828587949fb1979e8395df929e9c">[email&#160;protected]</a><br>
       Firmado por: <strong>Pedro Rivera</strong> — Post Venta · Revenue Management & New Business
     </div>
   </div>
@@ -1358,7 +1673,7 @@
 
 <div class="footer">Dashboard KPI Post Venta Ford 2026 · Grupo Curifor · Datos almacenados localmente en este navegador</div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── DATA STORE ──────────────────────────────────────────────────────────────
 const STORE_KEY = 'ford_pv_2026';
 const SUCURSALES = ['Curifor Chillan','Curifor Curico','Curifor Linderos','Curifor Rancagua'];
@@ -1373,8 +1688,7 @@ function cargarStore() {
 }
 function guardarStore(s) { localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
 
-let _sucActual = SUCURSALES[0];
-function getSucursal() { return _sucActual; }
+function getSucursal() { return document.getElementById('selSucursal').value; }
 function getMes() { return document.getElementById('selMes').value; }
 
 function getDato(suc, mes) {
@@ -1389,38 +1703,7 @@ function setDato(suc, mes, obj) {
 }
 
 // ── INIT ────────────────────────────────────────────────────────────────────
-// ── LOGIN ────────────────────────────────────────────────────────────────────
-const LOGIN_KEY = 'ford_cpv2026_auth';
-const DOMINIO   = '@curifor.com';
-const PASSWORD  = 'CPV2026';
-
-function loginCheck() {
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const pwd   = document.getElementById('login-pwd').value;
-  const errEl = document.getElementById('login-error');
-  if (!email.endsWith(DOMINIO)) {
-    errEl.textContent = 'El correo debe terminar en @curifor.com';
-    return;
-  }
-  if (pwd !== PASSWORD) {
-    errEl.textContent = 'Contraseña incorrecta.';
-    return;
-  }
-  localStorage.setItem(LOGIN_KEY, email);
-  document.getElementById('login-overlay').style.display = 'none';
-}
-
 window.addEventListener('DOMContentLoaded', () => {
-  // Login
-  ['login-email','login-pwd'].forEach(id => {
-    document.getElementById(id).addEventListener('keydown', e => {
-      if (e.key === 'Enter') loginCheck();
-    });
-  });
-  if (localStorage.getItem(LOGIN_KEY)) {
-    document.getElementById('login-overlay').style.display = 'none';
-  }
-
   // Seleccionar mes actual
   const now = new Date();
   const mesActual = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
@@ -1432,11 +1715,29 @@ window.addEventListener('DOMContentLoaded', () => {
 function cargarPagina() {
   cargarDatosCompra();
   renderDashboard();
+  updateContextStrip();
   renderDescuentos();
 }
 
 function cambiarSucursal() { cargarPagina(); }
 function cambiarMes() { cargarPagina(); }
+
+// ── CONTEXT STRIP + HERO UPDATE ──────────────────────────────────────────────
+function updateContextStrip() {
+  const suc = document.getElementById('selSucursal')?.value || '—';
+  const mesVal = document.getElementById('selMes')?.value || '';
+  const meses = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const [yr, mo] = mesVal.split('-');
+  const label = mo ? (meses[parseInt(mo)] + ' ' + yr) : mesVal;
+  const ctxSuc = document.getElementById('ctx-sucursal');
+  const ctxPer = document.getElementById('ctx-periodo');
+  const heroPer = document.getElementById('hero-periodo');
+  const heroSuc = document.getElementById('hero-suc');
+  if (ctxSuc) ctxSuc.textContent = suc;
+  if (ctxPer) ctxPer.textContent = label;
+  if (heroPer) heroPer.textContent = label;
+  if (heroSuc) heroSuc.textContent = suc;
+}
 
 // ── TABS ────────────────────────────────────────────────────────────────────
 function showTab(id) {
@@ -1670,97 +1971,100 @@ function semaforo(pct) {
 }
 
 // ── CÁLCULO COMPRA ──────────────────────────────────────────────────────────
-// ── COMPRA: tabla red completa ────────────────────────────────────────────────
-const INP = s => `border:1px solid #CBD5E0;border-radius:4px;padding:5px 6px;font-size:12px;width:100%;text-align:right;`;
+function calcularCompra() {
+  const meta     = parseFloat(document.getElementById('in-meta').value)     || 0;
+  const comprado = parseFloat(document.getElementById('in-comprado').value) || 0;
+  const gnm      = parseFloat(document.getElementById('in-gnm').value)      || 0;
+  const ncm      = parseFloat(document.getElementById('in-ncm').value)      || 0;
+  const nps      = parseFloat(document.getElementById('in-nps').value)      || 0;
+  const tasa     = parseFloat(document.getElementById('in-tasa').value)     || 0;
+  const chkNPS   = document.getElementById('chk-nps').checked;
 
-function _calcRow(i) {
-  const v = f => parseFloat(document.getElementById(f+i)?.value) || 0;
-  const meta=v('cm-meta-'), comprado=v('cm-comp-'), gnm=v('cm-gnm-'), ncm=v('cm-ncm-');
-  const nps=v('cm-nps-'), tasa=v('cm-tasa-');
-  const chk = document.getElementById('cm-chk-'+i)?.checked || false;
   const blm = Math.max(0, comprado - gnm - ncm);
-  const pct = meta > 0 ? comprado/meta*100 : 0;
-  let rebBase = pct>=110 ? 5 : pct>=100 ? 4 : 0;
-  const npsOk = (nps>=83 && tasa>=18) || chk;
-  const bonus = rebBase>0 && npsOk ? 1 : 0;
+  const pct = meta > 0 ? (comprado / meta) * 100 : 0;
+
+  document.getElementById('in-blm').value = blm > 0 ? fmtMoney(blm) : '';
+  document.getElementById('in-pct').value = meta > 0 ? fmtPct(pct) : '';
+
+  // Rebate base
+  let rebBase = 0;
+  if (pct >= 110) rebBase = 5.0;
+  else if (pct >= 100) rebBase = 4.0;
+
+  // Bonus NPS
+  const npsOk = (nps >= 83 && tasa >= 18) || chkNPS;
+  const bonus = (rebBase > 0 && npsOk) ? 1.0 : 0.0;
   const rebTotal = rebBase + bonus;
-  const el = id => document.getElementById(id);
-  if(el('cm-blm-'+i))  el('cm-blm-'+i).textContent  = blm>0 ? fmtMoney(blm) : '—';
-  if(el('cm-pct-'+i))  el('cm-pct-'+i).textContent  = meta>0 ? fmtPct(pct) : '—';
-  if(el('cm-reb-'+i)) {
-    const r = el('cm-reb-'+i);
-    r.textContent = rebTotal>0 ? rebTotal.toFixed(1)+'%' : '0%';
-    r.style.fontWeight='700';
-    r.style.color = rebTotal>=4 ? 'var(--verde)' : rebTotal>0 ? 'var(--amarillo)' : 'var(--rojo)';
+  const montoRebate = blm * (rebTotal / 100);
+
+  // UI
+  const box = document.getElementById('rebate-result');
+  const pctEl = document.getElementById('rebate-pct-val');
+  const detEl = document.getElementById('rebate-detail-txt');
+  box.className = 'rebate-box';
+  pctEl.className = 'rebate-pct';
+
+  if (meta === 0) {
+    pctEl.textContent = '—';
+    detEl.innerHTML = 'Ingresa la meta mensual para calcular';
+    return;
   }
-  return {meta,comprado,gnm,ncm,nps,tasa,chkNPS:chk,blm,pct,rebBase,bonus,rebTotal};
-}
 
-function renderCompraTabla() {
-  const mes = getMes(); const store = cargarStore();
-  const tbody = document.getElementById('compra-tbody');
-  const tfoot = document.getElementById('compra-tfoot');
-  if(!tbody) return;
-  const inp = (id,val,ev) => `<input type="number" id="${id}" value="${val||''}" placeholder="0" oninput="${ev}" style="${INP()}">`;
-  tbody.innerHTML = SUCURSALES.map((suc,i) => {
-    const d = getDato(suc, mes);
-    return `<tr style="border-bottom:1px solid #E2E8F0;${i%2===0?'background:#F8FAFC':''}">
-      <td style="padding:8px 12px;font-weight:700;color:var(--ford);white-space:nowrap;">${suc}</td>
-      <td style="padding:4px 6px;">${inp('cm-meta-'+i, d.meta, '_calcRow('+i+')')}</td>
-      <td style="padding:4px 6px;">${inp('cm-comp-'+i, d.comprado, '_calcRow('+i+')')}</td>
-      <td style="padding:4px 6px;">${inp('cm-gnm-'+i, d.gnm, '_calcRow('+i+')')}</td>
-      <td style="padding:4px 6px;">${inp('cm-ncm-'+i, d.ncm, '_calcRow('+i+')')}</td>
-      <td style="padding:8px 6px;text-align:center;font-size:12px;" id="cm-blm-${i}">${d.blm>0?fmtMoney(d.blm):'—'}</td>
-      <td style="padding:8px 6px;text-align:center;font-size:12px;" id="cm-pct-${i}">${d.pct>0?fmtPct(d.pct):'—'}</td>
-      <td style="padding:4px 6px;">${inp('cm-nps-'+i, d.nps, '_calcRow('+i+')')}</td>
-      <td style="padding:4px 6px;">${inp('cm-tasa-'+i, d.tasa, '_calcRow('+i+')')}</td>
-      <td style="padding:8px 6px;text-align:center;"><input type="checkbox" id="cm-chk-${i}" ${d.chkNPS?'checked':''} onchange="_calcRow(${i})" title="NPS OK manual"></td>
-      <td style="padding:8px 10px;text-align:center;font-size:13px;" id="cm-reb-${i}"
-        style="color:${d.rebTotal>=4?'var(--verde)':d.rebTotal>0?'var(--amarillo)':'var(--rojo)'}">
-        ${d.rebTotal>0?d.rebTotal.toFixed(1)+'%':'0%'}
-      </td>
-    </tr>`;
-  }).join('');
-  // Fila totales
-  const tots = SUCURSALES.reduce((a,suc)=>{ const d=getDato(suc,mes);
-    return {meta:a.meta+(d.meta||0), comp:a.comp+(d.comprado||0), blm:a.blm+(d.blm||0),
-            monto:a.monto+(d.blm||0)*(d.rebTotal||0)/100}; },{meta:0,comp:0,blm:0,monto:0});
-  const pctTot = tots.meta>0 ? tots.comp/tots.meta*100 : 0;
-  tfoot.innerHTML = `<tr style="background:var(--ford);color:#fff;font-weight:700;">
-    <td style="padding:8px 12px;">GRUPO CURIFOR</td>
-    <td style="padding:8px 6px;text-align:center;font-size:12px;">${fmtMoney(tots.meta)}</td>
-    <td style="padding:8px 6px;text-align:center;font-size:12px;">${fmtMoney(tots.comp)}</td>
-    <td colspan="2" style="padding:8px 6px;text-align:center;font-size:11px;">—</td>
-    <td style="padding:8px 6px;text-align:center;font-size:12px;">${fmtMoney(tots.blm)}</td>
-    <td style="padding:8px 6px;text-align:center;font-size:12px;">${tots.meta>0?fmtPct(pctTot):'—'}</td>
-    <td colspan="3" style="padding:8px 6px;text-align:center;font-size:11px;">—</td>
-    <td style="padding:8px 10px;text-align:center;font-size:12px;">${fmtMoney(tots.monto)}</td>
-  </tr>`;
+  if (rebTotal > 0) {
+    const color = 'verde';
+    box.classList.add(color);
+    pctEl.classList.add(color);
+    pctEl.textContent = rebTotal.toFixed(1) + '%';
+    detEl.innerHTML = `<b>Cumplimiento: ${fmtPct(pct)}</b> · BLM: ${fmtMoney(blm)}<br>
+      Rebate base: ${rebBase}% ${bonus > 0 ? '+ Bonus NPS: +1%' : ''}<br>
+      <b>Monto estimado: ${fmtMoney(montoRebate)}</b>`;
+  } else {
+    box.classList.add('rojo');
+    pctEl.classList.add('rojo');
+    pctEl.textContent = '0%';
+    detEl.innerHTML = `<b>Cumplimiento: ${fmtPct(pct)}</b> · BLM: ${fmtMoney(blm)}<br>No se alcanzó el objetivo (mín. 100%) · Rebate: $0`;
+  }
 }
-
-function calcularCompra() { SUCURSALES.forEach((_,i) => _calcRow(i)); }
 
 function guardarCompra() {
-  const mes = getMes();
-  SUCURSALES.forEach((suc, i) => {
-    const d = _calcRow(i);
-    setDato(suc, mes, d);
-  });
+  const meta     = parseFloat(document.getElementById('in-meta').value)     || 0;
+  const comprado = parseFloat(document.getElementById('in-comprado').value) || 0;
+  const gnm      = parseFloat(document.getElementById('in-gnm').value)      || 0;
+  const ncm      = parseFloat(document.getElementById('in-ncm').value)      || 0;
+  const nps      = parseFloat(document.getElementById('in-nps').value)      || 0;
+  const tasa     = parseFloat(document.getElementById('in-tasa').value)     || 0;
+  const chkNPS   = document.getElementById('chk-nps').checked;
+
+  const blm = Math.max(0, comprado - gnm - ncm);
+  const pct = meta > 0 ? (comprado / meta) * 100 : 0;
+  let rebBase = 0;
+  if (pct >= 110) rebBase = 5.0;
+  else if (pct >= 100) rebBase = 4.0;
+  const npsOk = (nps >= 83 && tasa >= 18) || chkNPS;
+  const bonus = (rebBase > 0 && npsOk) ? 1.0 : 0.0;
+  const rebTotal = rebBase + bonus;
+
+  setDato(getSucursal(), getMes(), { meta, comprado, gnm, ncm, nps, tasa, chkNPS, blm, pct, rebBase, bonus, rebTotal });
   renderDashboard();
-  showToast('✅ Datos de red guardados correctamente');
+  showToast('✅ Datos guardados correctamente');
 }
 
-function cargarDatosCompra() { renderCompraTabla(); }
+function cargarDatosCompra() {
+  const d = getDato(getSucursal(), getMes());
+  document.getElementById('in-meta').value     = d.meta     || '';
+  document.getElementById('in-comprado').value = d.comprado || '';
+  document.getElementById('in-gnm').value      = d.gnm      || '';
+  document.getElementById('in-ncm').value      = d.ncm      || '';
+  document.getElementById('in-nps').value      = d.nps      || '';
+  document.getElementById('in-tasa').value     = d.tasa     || '';
+  document.getElementById('chk-nps').checked   = d.chkNPS   || false;
+  calcularCompra();
+}
 
 function limpiarCompra() {
-  const mes = getMes();
-  SUCURSALES.forEach((suc,i) => {
-    ['cm-meta-','cm-comp-','cm-gnm-','cm-ncm-','cm-nps-','cm-tasa-'].forEach(p => {
-      const el = document.getElementById(p+i); if(el) el.value='';
-    });
-    const chk = document.getElementById('cm-chk-'+i); if(chk) chk.checked=false;
-    _calcRow(i);
-  });
+  ['in-meta','in-comprado','in-gnm','in-ncm','in-nps','in-tasa'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('chk-nps').checked = false;
+  calcularCompra();
 }
 
 // ── DASHBOARD ────────────────────────────────────────────────────────────────
@@ -1818,7 +2122,7 @@ function renderDashboard() {
   const pctFillGrupo = Math.min(pctTotal, 130);
   const fillColorG   = pctTotal >= 100 ? 'verde' : (pctTotal >= 85 ? 'amarillo' : 'rojo');
   grid.innerHTML += `
-    <div class="suc-card" style="border:2px solid var(--azul); grid-column:1/-1;">
+    <div class="suc-card" style="border-top:3px solid var(--ford); grid-column:1/-1;">
       <div class="suc-name" style="font-size:14px;">🏢 Grupo Curifor — Consolidado</div>
       <div class="suc-row"><span>% Cumplimiento</span><span class="semaforo s-${hasDatos ? fillColorG : 'gris'}">${hasDatos ? fmtPct(pctTotal) : 'Sin datos'}</span></div>
       <div class="progress-wrap"><div class="progress-fill ${fillColorG}" style="width:${pctFillGrupo}%"></div></div>
@@ -1828,6 +2132,11 @@ function renderDashboard() {
       <div class="suc-row"><span>Monto Rebate Est.</span><span><strong>${hasDatos ? fmtMoney(totalMonto) : '—'}</strong></span></div>
     </div>`;
 
+  // ── Hero strip update ──
+  const heroPct = document.getElementById('hero-pct');
+  const heroReb = document.getElementById('hero-rebate');
+  if (heroPct) heroPct.textContent = hasDatos ? fmtPct(pctTotal) : '—';
+  if (heroReb) heroReb.textContent = 'Rebate ponderado · ' + (hasDatos ? (rebPond > 0 ? rebPond.toFixed(1) + '%' : '0%') : '—');
 }
 
 // ── DESCUENTOS ───────────────────────────────────────────────────────────────
@@ -2345,10 +2654,10 @@ async function procesarExcelNPS() {
       if (isNaN(nC)||isNaN(nM)) return;
       totEnc++;
 
-      // Marca: 5=P, 4=N, 1-3=D (escala 1-5 Ford)
+      // Marca: 5=P, 4=N, 1-3=D
       const catM = nM===5?'P':(nM===4?'N':'D');
-      // Conc: 5=P, 4=N, 1-3=D; si Marca es Detractor (≤3) → forzar D en Conc.
-      const catC = nM<=3?'D':(nC===5?'P':(nC===4?'N':'D'));
+      // Conc: si Marca ≤3 → forzar D
+      const catC = nM<=3?'D':(nC>=4?'P':(nC===3?'N':'D'));
       const ftfrOk = ['sí','si','yes','1','true'].includes(ftfr);
       if (ftfr!=='') { ftfrTotal++; if (ftfrOk) ftfrSi++; }
 
@@ -2365,22 +2674,13 @@ async function procesarExcelNPS() {
       if (ftfr!==''){a.fTot++;if(ftfrOk)a.fSi++;}
     });
 
-    // Fórmula NPS estándar: (Promotores − Detractores) / Total × 100
-    const nps=(p,d,t)=>t>0?((p-d)/t)*100:0;
-    const pctSimple=(p,t)=>t>0?(p/t)*100:0; // solo para FTFR (no es NPS)
-    // Brecha: promotores adicionales necesarios para llegar a 83%
-    // NPS ≥ 83% → (P-D)/T ≥ 0.83 → P ≥ D + 0.83*T
-    const brC=(p,d,t,tgt=83)=>{
-      const npsVal=nps(p,d,t);
-      if(npsVal>=tgt) return null;
-      const needed=Math.ceil(d + tgt*t/100);
-      return Math.max(0, needed - p);
-    };
+    const pct=(p,t)=>t>0?(p/t)*100:0;
+    const brC=(n,t)=>n<83?Math.max(0,Math.ceil(83*t/100)-Math.floor(n*t/100)):null;
 
     const sucursales = Object.entries(sucMap).map(([nombre,s])=>{
       const tC=s.pC+s.nC+s.dC, tM=s.pM+s.nM+s.dM;
-      const npsC=nps(s.pC,s.dC,tC), npsM=nps(s.pM,s.dM,tM), ftP=s.fTot>0?pctSimple(s.fSi,s.fTot):0;
-      const bC=brC(s.pC,s.dC,tC), bM=brC(s.pM,s.dM,tM);
+      const npsC=pct(s.pC,tC), npsM=pct(s.pM,tM), ftP=s.fTot>0?pct(s.fSi,s.fTot):0;
+      const bC=brC(npsC,tC), bM=brC(npsM,tM);
       const bF=ftP<95&&s.fTot>0?Math.ceil(95*s.fTot/100)-s.fSi:null;
       const estado=npsC>=83&&npsM>=83&&ftP>=95?'Logrado':(npsC<83&&npsM<83?'No logrado':'Parcial');
       return {nombre,encuestas:s.enc,prom_conc:s.pC,neut_conc:s.nC,det_conc:s.dC,nps_conc:+npsC.toFixed(1),
@@ -2391,8 +2691,8 @@ async function procesarExcelNPS() {
 
     const asesores = Object.entries(asMap).map(([nombre,a])=>{
       const tC=a.pC+a.nC+a.dC, tM=a.pM+a.nM+a.dM;
-      const npsC=nps(a.pC,a.dC,tC), npsM=nps(a.pM,a.dM,tM), ftP=a.fTot>0?pctSimple(a.fSi,a.fTot):0;
-      const bC=brC(a.pC,a.dC,tC), bM=brC(a.pM,a.dM,tM);
+      const npsC=pct(a.pC,tC), npsM=pct(a.pM,tM), ftP=a.fTot>0?pct(a.fSi,a.fTot):0;
+      const bC=brC(npsC,tC), bM=brC(npsM,tM);
       const bF=ftP<95&&a.fTot>0?Math.ceil(95*a.fTot/100)-a.fSi:null;
       return {nombre,sucursal:a.suc,ots:a.ots,nps_conc:+npsC.toFixed(1),nps_marca:+npsM.toFixed(1),ftfr:+ftP.toFixed(1),
         brecha_conc:bC?`+${bC} prom.`:null, brecha_marca:bM?`+${bM} prom.`:null, brecha_ftfr:bF?`+${bF} FTFR`:null};
@@ -2403,7 +2703,7 @@ async function procesarExcelNPS() {
       return b.nps_conc-a.nps_conc||b.nps_marca-a.nps_marca||b.ftfr-a.ftfr;
     }).map((a,i)=>({rank:i+1,...a}));
 
-    // Totales grupo (suma de promotores y detractores de todas las sucursales)
+    // Totales grupo
     const tPC=sucursales.reduce((s,x)=>s+x.prom_conc,0);
     const tNC=sucursales.reduce((s,x)=>s+x.neut_conc,0);
     const tDC=sucursales.reduce((s,x)=>s+x.det_conc,0);
@@ -2411,7 +2711,7 @@ async function procesarExcelNPS() {
     const tNM=sucursales.reduce((s,x)=>s+x.neut_marca,0);
     const tDM=sucursales.reduce((s,x)=>s+x.det_marca,0);
     const nG=tPC+tNC+tDC, nGM=tPM+tNM+tDM;
-    const npsGC=+nps(tPC,tDC,nG).toFixed(1), npsGM=+nps(tPM,tDM,nGM).toFixed(1), ftG=+(ftfrTotal>0?pctSimple(ftfrSi,ftfrTotal):0).toFixed(1);
+    const npsGC=+pct(tPC,nG).toFixed(1), npsGM=+pct(tPM,nGM).toFixed(1), ftG=+(ftfrTotal>0?pct(ftfrSi,ftfrTotal):0).toFixed(1);
     const hoy=new Date(); const fecha=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
 
     npsProcessedData = {
