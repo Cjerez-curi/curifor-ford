@@ -1668,6 +1668,53 @@
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── DATA STORE ──────────────────────────────────────────────────────────────
 const STORE_KEY = 'ford_pv_2026';
+
+// ── GITHUB SYNC (datos compartidos entre usuarios) ─────────────────────────
+const _GHu = 'Cjerez-curi';
+const _GHr = 'curifor-ford';
+const _GHf = 'datos_ford.json';
+const _GH_RAW = `https://raw.githubusercontent.com/${_GHu}/${_GHr}/main/${_GHf}`;
+const _GH_API = `https://api.github.com/repos/${_GHu}/${_GHr}/contents/${_GHf}`;
+const _TK_KEY = 'curifor_gh_token';
+
+async function cargarDesdeGitHub() {
+  try {
+    const r = await fetch(_GH_RAW + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    const data = await r.json();
+    if (data && typeof data === 'object') {
+      localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    }
+  } catch(e) { /* fallback a localStorage si no hay red */ }
+}
+
+async function subirAGitHub(data) {
+  // Primero intentar con el token del config NPS (si ya fue configurado)
+  const cfg = JSON.parse(localStorage.getItem('gh_config') || '{}');
+  let tk = localStorage.getItem(_TK_KEY) || cfg.token || '';
+  if (!tk) {
+    tk = prompt('🔑 Primera sincronización con el equipo\n\nIngresa el token de acceso (pídelo a Cristóbal).\nSolo se pedirá una vez en este navegador:');
+    if (!tk) return;
+    localStorage.setItem(_TK_KEY, tk.trim());
+  }
+  try {
+    const hdrs = {
+      'Authorization': `token ${tk.trim()}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    };
+    let sha;
+    try {
+      const g = await fetch(_GH_API, { headers: hdrs });
+      if (g.ok) sha = (await g.json()).sha;
+      else if (g.status === 401) { localStorage.removeItem(_TK_KEY); return; }
+    } catch(e) {}
+    const contenido = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    const body = { message: 'Actualizar KPI Ford', content: contenido, ...(sha ? {sha} : {}) };
+    const res = await fetch(_GH_API, { method: 'PUT', headers: hdrs, body: JSON.stringify(body) });
+    if (res.status === 401) localStorage.removeItem(_TK_KEY);
+  } catch(e) { /* guardado local OK aunque falle GitHub */ }
+}
 const SUCURSALES = ['Curifor Chillan','Curifor Curico','Curifor Linderos','Curifor Rancagua'];
 const MESES_LABEL = {
   '2026-01':'Enero','2026-02':'Febrero','2026-03':'Marzo','2026-04':'Abril',
@@ -1678,7 +1725,10 @@ const MESES_LABEL = {
 function cargarStore() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; }
 }
-function guardarStore(s) { localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+function guardarStore(s) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(s));
+  subirAGitHub(s);
+}
 
 function getSucursal() { return SUCURSALES[0]; }
 function getMes() { return document.getElementById('selMes').value; }
@@ -1695,12 +1745,13 @@ function setDato(suc, mes, obj) {
 }
 
 // ── INIT ────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  // Seleccionar mes actual
+window.addEventListener('DOMContentLoaded', async () => {
   const now = new Date();
   const mesActual = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   const sel = document.getElementById('selMes');
   for (let o of sel.options) if (o.value === mesActual) { o.selected = true; break; }
+  // Cargar datos compartidos desde GitHub antes de renderizar
+  await cargarDesdeGitHub();
   cargarPagina();
 });
 
@@ -2038,7 +2089,7 @@ function guardarCompra() {
 
   setDato(getSucursal(), getMes(), { meta, comprado, gnm, ncm, nps, tasa, chkNPS, blm, pct, rebBase, bonus, rebTotal });
   renderDashboard();
-  showToast('✅ Datos guardados correctamente');
+  showToast('✅ Guardado · sincronizando con equipo...');
 }
 
 function cargarDatosCompra() {
